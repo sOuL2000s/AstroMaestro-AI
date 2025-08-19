@@ -1,0 +1,424 @@
+/* Basic Reset & Body Styling */
+body {
+    font-family: 'Playfair Display', serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom right, #0a0e1c, #1a0f2e, #2c1240); /* Deep cosmic gradient */
+    color: #f0e6da; /* Off-white for readability */
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 30px 0;
+    text-align: center;
+    border-bottom: 1px solid rgba(138, 43, 226, 0.3); /* Amethyst line */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 3.5em;
+    color: #e6c78e; /* Gold */
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+    margin-bottom: 5px;
+}
+
+header p {
+    font-size: 1.2em;
+    font-style: italic;
+    color: #d1b19a;
+}
+
+/* Navigation */
+nav {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px 0;
+    text-align: center;
+    border-bottom: 1px solid rgba(138, 43, 226, 0.3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+nav button {
+    background: #8a2be2; /* Amethyst */
+    color: #f0e6da;
+    border: none;
+    padding: 12px 25px;
+    margin: 0 10px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 1.1em;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+nav button:hover {
+    background: #9932cc; /* Darker amethyst */
+    transform: translateY(-2px);
+}
+
+nav button:active {
+    transform: translateY(0);
+}
+
+/* Main Content Sections */
+main {
+    flex-grow: 1; /* Allows main content to expand */
+    padding-top: 30px;
+    padding-bottom: 50px;
+}
+
+section {
+    background: rgba(10, 10, 20, 0.7); /* Slightly transparent dark background */
+    border-radius: 15px;
+    padding: 40px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(138, 43, 226, 0.4);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    display: none; /* Hidden by default */
+}
+
+section.active {
+    display: block; /* Show active section */
+}
+
+section h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5em;
+    color: #e6c78e;
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+section p {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+    color: #ccc;
+}
+
+/* Forms */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+form label {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1em;
+    color: #d1b19a;
+    margin-bottom: 5px;
+}
+
+form input[type="text"],
+form input[type="date"],
+form input[type="time"],
+form select {
+    padding: 12px 15px;
+    border: 1px solid #8a2be2;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #f0e6da;
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+form input[type="text"]:focus,
+form input[type="date"]:focus,
+form input[type="time"]:focus,
+form select:focus {
+    border-color: #e6c78e;
+    box-shadow: 0 0 8px rgba(230, 199, 142, 0.5);
+}
+
+/* Placeholder color for inputs */
+form input::placeholder {
+    color: #a090a0;
+}
+
+/* For date and time inputs in some browsers, colors might need specific overrides */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* Makes the icon white */
+}
+
+
+form button[type="submit"] {
+    background: #e6c78e; /* Gold */
+    color: #1a0f2e; /* Deep purple */
+    border: none;
+    padding: 15px 30px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 1.2em;
+    margin-top: 20px;
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+form button[type="submit"]:hover {
+    background: #f0d4a7; /* Lighter gold */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Report Output */
+.report-output {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(230, 199, 142, 0.5); /* Gold border */
+    border-radius: 10px;
+    margin-top: 40px;
+    padding: 30px;
+    box-shadow: inset 0 0 15px rgba(230, 199, 142, 0.2);
+    min-height: 200px;
+    display: none; /* Hidden by default */
+    position: relative;
+}
+
+.report-output.active {
+    display: block;
+}
+
+.report-output h3 {
+    font-family: 'Cinzel', serif;
+    color: #e6c78e;
+    font-size: 2em;
+    text-align: center;
+    margin-bottom: 25px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.report-content {
+    font-size: 1.1em;
+    color: #f0e6da;
+    line-height: 1.8;
+    white-space: pre-wrap; /* Preserves line breaks from AI output */
+    overflow-y: auto;
+    max-height: 400px; /* Limit height for long reports */
+    padding-right: 15px; /* Space for scrollbar */
+}
+
+/* Scrollbar styling */
+.report-content::-webkit-scrollbar {
+    width: 8px;
+}
+.report-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+.report-content::-webkit-scrollbar-thumb {
+    background: #8a2be2;
+    border-radius: 10px;
+}
+.report-content::-webkit-scrollbar-thumb:hover {
+    background: #9932cc;
+}
+
+
+.download-pdf-btn {
+    background: #28a745; /* Green for download */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 1em;
+    margin-top: 25px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    transition: background 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.download-pdf-btn:hover {
+    background: #218838;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Chat Assistant */
+.chat-container {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(138, 43, 226, 0.5);
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 500px; /* Fixed height for chat window */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 15px; /* Space for scrollbar */
+    margin-bottom: 15px;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 8px;
+}
+.chat-messages::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #8a2be2;
+    border-radius: 10px;
+}
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #9932cc;
+}
+
+
+.message {
+    padding: 10px 15px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.user-message {
+    background: #8a2be2; /* Amethyst for user */
+    align-self: flex-end;
+    margin-left: auto;
+    text-align: right;
+}
+
+.bot-message {
+    background: #333; /* Darker grey for bot */
+    align-self: flex-start;
+    margin-right: auto;
+    border: 1px solid #555;
+}
+
+#chat-form {
+    display: flex;
+    gap: 10px;
+}
+
+#chat-input {
+    flex-grow: 1;
+    padding: 12px 15px;
+    border: 1px solid #8a2be2;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #f0e6da;
+    font-size: 1em;
+    outline: none;
+}
+
+#chat-form button {
+    background: #e6c78e;
+    color: #1a0f2e;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 1em;
+    transition: background 0.3s ease;
+}
+
+#chat-form button:hover {
+    background: #f0d4a7;
+}
+
+/* Footer */
+footer {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 20px 0;
+    text-align: center;
+    border-top: 1px solid rgba(138, 43, 226, 0.3);
+    color: #ccc;
+    font-size: 0.9em;
+    margin-top: auto; /* Pushes footer to the bottom */
+}
+
+footer p {
+    margin: 5px 0;
+}
+
+/* PDF Template Styling (Hidden on regular page) */
+.pdf-template {
+    background: #f0e6da; /* Light background for PDF */
+    color: #1a0f2e; /* Dark text for PDF */
+    font-family: 'Playfair Display', serif;
+    padding: 40px;
+    box-sizing: border-box; /* Include padding in element's total width and height */
+    width: 210mm; /* A4 width */
+    min-height: 297mm; /* A4 height */
+}
+
+.pdf-header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #8a2be2;
+    padding-bottom: 20px;
+}
+
+.pdf-logo {
+    width: 80px;
+    height: 80px;
+    display: block;
+    margin: 0 auto 10px;
+}
+
+.pdf-header h2 {
+    font-family: 'Cinzel', serif;
+    color: #8a2be2;
+    font-size: 2.8em;
+    margin: 0;
+}
+
+.pdf-header h3 {
+    font-family: 'Playfair Display', serif;
+    color: #e6c78e;
+    font-size: 1.5em;
+    margin: 5px 0 0;
+    font-style: italic;
+}
+
+.pdf-content {
+    font-size: 1.1em;
+    line-height: 1.7;
+    text-align: justify;
+    padding: 0 20px;
+}
+
+.pdf-content p {
+    margin-bottom: 1em;
+}
+
+.pdf-footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #ccc;
+    font-size: 0.9em;
+    color: #555;
+}
