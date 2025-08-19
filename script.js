@@ -36,13 +36,15 @@ document.addEventListener('DOMContentLoaded', () => {
             Focus on key planetary placements (Sun, Moon, Ascendant, Mercury, Venus, Mars), their signs and house placements (e.g., "Sun in Aries in 10th House"). 
             Describe the general personality traits, strengths, challenges, and life path indicated by these placements. 
             Do not perform complex calculations or list specific degrees/aspects, but provide interpretations based on common astrological significations. 
-            Maintain an inspiring, insightful, and slightly mystical tone. Format the output with clear headings for each section (e.g., "The Luminary Core: Sun & Moon", "The Mind & Heart: Mercury & Venus").`;
+            Maintain an inspiring, insightful, and slightly mystical tone. Format the output using **Markdown** with clear headings for each section (e.g., "## The Luminary Core: Sun & Moon", "## The Mind & Heart: Mercury & Venus", use bullet points for lists, and bold text for emphasis).`;
+            // ^ IMPORTANT: I've updated the prompt to explicitly ask for Markdown.
 
             const result = await window.model.generateContent(prompt);
             const response = await result.response;
             const text = response.text();
 
-            reportContentDiv.innerHTML = text.replace(/\n/g, '<br>'); // Replace newlines with <br> for HTML display
+            // Parse Markdown to HTML
+            reportContentDiv.innerHTML = marked.parse(text);
             astrologyReportOutput.querySelector('.download-pdf-btn').classList.remove('hidden');
 
         } catch (error) {
@@ -69,13 +71,15 @@ document.addEventListener('DOMContentLoaded', () => {
             Calculate and interpret the Life Path Number, Destiny Number (Expression Number), and Soul Urge Number (Heart's Desire Number). 
             Explain what each number means for their personality, talents, challenges, and purpose in life. 
             Provide the calculation steps briefly for each number if possible, or just the resulting number and its interpretation. 
-            Maintain an insightful and ancient tone, reflecting the wisdom of numbers.`;
+            Maintain an insightful and ancient tone, reflecting the wisdom of numbers. Format the output using **Markdown** with clear headings for each section (e.g., "## Life Path Number", "## Destiny Number", use bullet points for lists, and bold text for emphasis).`;
+            // ^ IMPORTANT: I've updated the prompt to explicitly ask for Markdown.
 
             const result = await window.model.generateContent(prompt);
             const response = await result.response;
             const text = response.text();
 
-            reportContentDiv.innerHTML = text.replace(/\n/g, '<br>');
+            // Parse Markdown to HTML
+            reportContentDiv.innerHTML = marked.parse(text);
             numerologyReportOutput.querySelector('.download-pdf-btn').classList.remove('hidden');
 
         } catch (error) {
@@ -94,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Display user message
         const userMsgDiv = document.createElement('div');
         userMsgDiv.classList.add('message', 'user-message');
-        userMsgDiv.textContent = userMessage;
+        userMsgDiv.textContent = userMessage; // User input is plain text
         chatMessages.appendChild(userMsgDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom
 
@@ -108,8 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
         try {
-            const prompt = `You are AstroMaestro AI, an expert and mystical guide in astrology and numerology. Provide concise, helpful, and insightful answers. If the question is about a personal report, assume they are asking about a report they just generated (though you don't have direct memory of it, phrase it generally).
+            const prompt = `You are AstroMaestro AI, an expert and mystical guide in astrology and numerology. Provide concise, helpful, and insightful answers. If the question is about a personal report, assume they are asking about a report they just generated (though you don't have direct memory of it, phrase it generally). Format your response using **Markdown** (e.g., bold for keywords, bullet points for lists if applicable).
             User's question: "${userMessage}"`;
+            // ^ IMPORTANT: Updated prompt to ask for Markdown
 
             const result = await window.model.generateContent(prompt);
             const response = await result.response;
@@ -119,7 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const botMsgDiv = document.createElement('div');
             botMsgDiv.classList.add('message', 'bot-message');
-            botMsgDiv.textContent = botReply;
+            // Parse Markdown to HTML for bot replies
+            botMsgDiv.innerHTML = marked.parse(botReply);
             chatMessages.appendChild(botMsgDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom
 
@@ -149,9 +155,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const reportOutput = document.getElementById(contentDivId).querySelector('.report-content').innerHTML;
+        const reportOutputHTML = document.getElementById(contentDivId).querySelector('.report-content').innerHTML;
         const pdfTemplate = document.getElementById(templateDivId);
-        pdfTemplate.querySelector('.pdf-content').innerHTML = reportOutput; // Populate the hidden PDF template
+        pdfTemplate.querySelector('.pdf-content').innerHTML = reportOutputHTML; // Populate the hidden PDF template with the HTML (already parsed markdown)
 
         // Temporarily make the template visible for html2canvas to render
         pdfTemplate.style.display = 'block';

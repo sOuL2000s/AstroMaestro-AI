@@ -422,3 +422,165 @@ footer p {
     font-size: 0.9em;
     color: #555;
 }
+
+/* ... (existing CSS) ... */
+
+/* Report Content & Chat Message General Text Styling */
+.report-content,
+.chat-messages .message {
+    font-size: 1.1em;
+    color: #f0e6da;
+    line-height: 1.8;
+}
+
+/* Markdown Headings in Reports and Chat */
+.report-content h1,
+.report-content h2,
+.report-content h3,
+.chat-messages .message h1,
+.chat-messages .message h2,
+.chat-messages .message h3 {
+    font-family: 'Cinzel', serif;
+    color: #e6c78e; /* Gold */
+    margin-top: 1.5em;
+    margin-bottom: 0.8em;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    line-height: 1.3;
+}
+
+.report-content h1,
+.chat-messages .message h1 { font-size: 2em; text-align: center; } /* Main report titles within content */
+.report-content h2,
+.chat-messages .message h2 { font-size: 1.8em; }
+.report-content h3,
+.chat-messages .message h3 { font-size: 1.5em; }
+
+/* Paragraphs */
+.report-content p,
+.chat-messages .message p {
+    margin-bottom: 1em;
+}
+
+/* Lists */
+.report-content ul,
+.report-content ol,
+.chat-messages .message ul,
+.chat-messages .message ol {
+    margin-left: 20px;
+    margin-bottom: 1em;
+    padding-left: 10px;
+}
+
+.report-content li,
+.chat-messages .message li {
+    margin-bottom: 0.5em;
+}
+
+/* Strong/Bold text */
+.report-content strong,
+.chat-messages .message strong {
+    color: #e6c78e; /* Make bold text gold for emphasis */
+    font-weight: 700; /* Ensure it's truly bold */
+}
+
+/* Emphasis/Italic text */
+.report-content em,
+.chat-messages .message em {
+    color: #d1b19a; /* A slightly softer gold/bronze for italics */
+    font-style: italic;
+}
+
+/* Blockquotes */
+.report-content blockquote,
+.chat-messages .message blockquote {
+    border-left: 4px solid #8a2be2; /* Amethyst border */
+    padding-left: 15px;
+    margin: 1em 0;
+    font-style: italic;
+    color: #bbb;
+}
+
+/* Code blocks (if used by AI) */
+.report-content pre,
+.chat-messages .message pre {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-family: monospace;
+    font-size: 0.9em;
+    border: 1px solid rgba(138, 43, 226, 0.3);
+}
+
+.report-content code,
+.chat-messages .message code {
+    background: rgba(138, 43, 226, 0.2);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+    color: #f0e6da;
+}
+
+/* Adjustments for PDF template to ensure markdown also looks good */
+.pdf-content h1,
+.pdf-content h2,
+.pdf-content h3 {
+    font-family: 'Cinzel', serif;
+    color: #8a2be2; /* Amethyst for headings in PDF */
+    margin-top: 1.2em;
+    margin-bottom: 0.6em;
+}
+.pdf-content h1 { font-size: 2.2em; text-align: center; }
+.pdf-content h2 { font-size: 1.8em; }
+.pdf-content h3 { font-size: 1.5em; }
+
+.pdf-content p {
+    margin-bottom: 0.8em;
+    color: #333; /* Darker text for readability in PDF */
+}
+
+.pdf-content ul,
+.pdf-content ol {
+    margin-left: 25px;
+    margin-bottom: 0.8em;
+    color: #333;
+}
+
+.pdf-content li {
+    margin-bottom: 0.4em;
+}
+
+.pdf-content strong {
+    font-weight: bold;
+    color: #8a2be2; /* Amethyst for bold in PDF */
+}
+
+.pdf-content em {
+    font-style: italic;
+    color: #555;
+}
+
+.pdf-content blockquote {
+    border-left: 4px solid #8a2be2;
+    padding-left: 15px;
+    margin: 1em 0;
+    font-style: italic;
+    color: #666;
+}
+.pdf-content pre {
+    background: #eee;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-family: monospace;
+    font-size: 0.9em;
+    border: 1px solid #ccc;
+    color: #333;
+}
+.pdf-content code {
+    background: #e0e0e0;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+    color: #333;
+}
