@@ -206,8 +206,8 @@ if __name__ == "__main__":
 
     <!-- Floating Chat Assistant -->
     <div id="chat-bubble">
-        <!-- Ensure chat-icon.png exists in the same directory as index.html -->
-        <img src="chat-icon.png" alt="Chat with AI" class="chat-icon">
+        <!-- Lucide Chat Icon (message-circle) - Replaces chat-icon.png -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" stroke="none" class="lucide-chat-icon-svg"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
     </div>
 
     <div id="floating-chat-modal" class="hidden">
@@ -226,6 +226,18 @@ if __name__ == "__main__":
                         <li>Or simply "What's my daily horoscope?"</li>
                     </ul>
                 </div>
+                <!-- ADDED DUMMY MESSAGES FOR SCROLLING TESTING - REMOVE AFTER VERIFICATION -->
+                <div class="message user-message">Test message 1</div>
+                <div class="message bot-message">Bot reply 1. This is a longer message to ensure it takes up more vertical space and helps with the scrolling test.</div>
+                <div class="message user-message">Test message 2</div>
+                <div class="message bot-message">Bot reply 2. Even more content to push the boundaries of the chat window and confirm the scrollbar functionality.</div>
+                <div class="message user-message">Test message 3</div>
+                <div class="message bot-message">Bot reply 3. We are adding many messages to clearly demonstrate that the chat messages container is now correctly scrolling when content exceeds its visible area.</div>
+                <div class="message user-message">Test message 4</div>
+                <div class="message bot-message">Bot reply 4. The scrollbar should be visible on the right side, allowing you to scroll down and see all these test messages.</div>
+                <div class="message user-message">Test message 5</div>
+                <div class="message bot-message">Bot reply 5. Final long message to ensure full test.</div>
+                <!-- END DUMMY MESSAGES -->
             </div>
             <form id="floating-chat-form">
                 <input type="text" id="floating-chat-input" placeholder="Ask your question here..." required>
@@ -665,6 +677,11 @@ document.addEventListener('DOMContentLoaded', () => {
 --- START FILE: style.css ---
 
 /* Basic Reset & Body Styling */
+/* Added global box-sizing for consistent layout behavior */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
     font-family: 'Playfair Display', serif;
     margin: 0;
@@ -953,10 +970,11 @@ form button[type="submit"]:hover {
     background: #f0d4a7; /* Lighter gold */
 }
 
-#chat-bubble .chat-icon {
-    width: 35px; /* Adjust size of your chat icon image */
+#chat-bubble .lucide-chat-icon-svg { /* Updated selector for SVG icon */
+    width: 35px; /* Adjust size of the SVG icon */
     height: 35px;
-    filter: invert(1); /* Make icon white if it's dark */
+    /* fill is set to white directly in the SVG */
+    /* Removed filter: invert(1); as it's no longer needed for SVG */
 }
 
 #floating-chat-modal {
@@ -1020,6 +1038,7 @@ form button[type="submit"]:hover {
     overflow-y: auto;
     padding-right: 10px; /* Space for scrollbar */
     margin-bottom: 15px;
+    min-height: 0; /* Ensures proper scrolling within flex container */
 }
 
 /* Chat message styling */
@@ -1418,7 +1437,7 @@ footer p {
         width: 50px;
         height: 50px;
     }
-    #chat-bubble .chat-icon {
+    #chat-bubble .lucide-chat-icon-svg { /* Updated selector for SVG icon */
         width: 30px;
         height: 30px;
     }
@@ -1569,3 +1588,7 @@ footer p {
 }
 
 --- END FILE: style.css ---
+
+--------------------------------------------------------------------------------------
+
+there are issues with the chat with ai feature so fix that. make it perfect.

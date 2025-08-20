@@ -1,4 +1,9 @@
 /* Basic Reset & Body Styling */
+/* Added global box-sizing for consistent layout behavior */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
     font-family: 'Playfair Display', serif;
     margin: 0;
@@ -222,19 +227,23 @@ form button[type="submit"]:hover {
     padding-right: 15px; /* Space for scrollbar */
 }
 
-/* Scrollbar styling */
-.report-content::-webkit-scrollbar {
+/* Scrollbar styling for reports AND chat messages */
+.report-content::-webkit-scrollbar,
+#floating-chat-messages::-webkit-scrollbar {
     width: 8px;
 }
-.report-content::-webkit-scrollbar-track {
+.report-content::-webkit-scrollbar-track,
+#floating-chat-messages::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
 }
-.report-content::-webkit-scrollbar-thumb {
+.report-content::-webkit-scrollbar-thumb,
+#floating-chat-messages::-webkit-scrollbar-thumb {
     background: #8a2be2;
     border-radius: 10px;
 }
-.report-content::-webkit-scrollbar-thumb:hover {
+.report-content::-webkit-scrollbar-thumb:hover,
+#floating-chat-messages::-webkit-scrollbar-thumb:hover {
     background: #9932cc;
 }
 
@@ -287,10 +296,11 @@ form button[type="submit"]:hover {
     background: #f0d4a7; /* Lighter gold */
 }
 
-#chat-bubble .chat-icon {
-    width: 35px; /* Adjust size of your chat icon image */
+#chat-bubble .lucide-chat-icon-svg { /* Updated selector for SVG icon */
+    width: 35px; /* Adjust size of the SVG icon */
     height: 35px;
-    filter: invert(1); /* Make icon white if it's dark */
+    /* fill is set to white directly in the SVG */
+    /* Removed filter: invert(1); as it's no longer needed for SVG */
 }
 
 #floating-chat-modal {
@@ -354,6 +364,7 @@ form button[type="submit"]:hover {
     overflow-y: auto;
     padding-right: 10px; /* Space for scrollbar */
     margin-bottom: 15px;
+    min-height: 0; /* Ensures proper scrolling within flex container */
 }
 
 /* Chat message styling */
@@ -752,7 +763,7 @@ footer p {
         width: 50px;
         height: 50px;
     }
-    #chat-bubble .chat-icon {
+    #chat-bubble .lucide-chat-icon-svg { /* Updated selector for SVG icon */
         width: 30px;
         height: 30px;
     }
