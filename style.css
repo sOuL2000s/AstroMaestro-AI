@@ -320,18 +320,20 @@ form button[type="submit"]:hover {
     bottom: 100px; /* Above the bubble */
     right: 30px;
     width: 350px;
-    height: 500px;
+    height: 500px; /* Fixed height for the modal */
     background: rgba(10, 10, 20, 0.95); /* Slightly transparent dark background */
     border: 1px solid rgba(138, 43, 226, 0.6);
     border-radius: 15px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
     z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Contains inner elements */
+    display: flex; /* Makes it a flex container for its children */
+    flex-direction: column; /* Stacks children vertically */
+    overflow: hidden; /* Ensures content doesn't spill out, especially with border-radius */
 }
 
 .chat-header {
+    /* This section appears "fixed" at the top because it's the first child in a flex-column container
+       and its size is set by its content (auto). */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -342,6 +344,8 @@ form button[type="submit"]:hover {
     color: #f0e6da;
     font-family: 'Cinzel', serif;
     font-size: 1.1em;
+    flex: 0 0 auto; /* Shorthand for: flex-grow: 0, flex-shrink: 0, flex-basis: auto.
+                       It will not grow or shrink, taking its content's size. */
 }
 
 .chat-header h3 {
@@ -364,19 +368,23 @@ form button[type="submit"]:hover {
     color: #e6c78e;
 }
 
-.chat-container { /* Reused for the modal's internal structure */
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    /* Removed padding from here, moved to #floating-chat-messages */
+.chat-container {
+    /* This element takes up all available vertical space between the header and the input form within the modal.
+       It also acts as a flex container for the messages and the form. */
+    flex: 1 1 auto; /* Shorthand for: flex-grow: 1, flex-shrink: 1, flex-basis: auto.
+                       It will grow to fill available space, but can shrink if needed. */
+    display: flex; /* Make it a flex container too */
+    flex-direction: column; /* Arrange its children (messages, form) vertically */
 }
 
 #floating-chat-messages {
-    flex-grow: 1;
-    overflow-y: auto;
+    /* This is the main scrollable area. It expands to fill available space within .chat-container. */
+    flex: 1 1 auto; /* Shorthand for: flex-grow: 1, flex-shrink: 1, flex-basis: auto.
+                       It will grow to fill remaining space, allowing it to take up height for scrolling. */
+    overflow-y: auto; /* This makes the content scrollable vertically when it overflows its height. */
     padding: 15px; /* Added padding here for scrollable area */
     margin-bottom: 0; /* Ensures it plays well with flex-grow */
-    min-height: 0; /* Ensures proper scrolling within flex container */
+    min-height: 0; /* Critical for scrollable flex items to prevent them from "over-filling" their container before scrolling */
 }
 
 /* Chat message styling */
@@ -471,10 +479,14 @@ form button[type="submit"]:hover {
 
 
 #floating-chat-form {
+    /* This section appears "fixed" at the bottom because it's the last child of its flex-column parent (.chat-container)
+       and its size is set by its content (auto). */
     display: flex;
     gap: 10px;
     padding: 10px 15px 15px; /* Add padding here for input form area */
     border-top: 1px solid rgba(138, 43, 226, 0.3);
+    flex: 0 0 auto; /* Shorthand for: flex-grow: 0, flex-shrink: 0, flex-basis: auto.
+                       It will not grow or shrink, taking its content's size. */
 }
 
 #floating-chat-input {
