@@ -371,16 +371,15 @@ form button[type="submit"]:hover {
 .chat-container {
     /* This element takes up all available vertical space between the header and the input form within the modal.
        It also acts as a flex container for the messages and the form. */
-    flex: 1 1 auto; /* Shorthand for: flex-grow: 1, flex-shrink: 1, flex-basis: auto.
-                       It will grow to fill available space, but can shrink if needed. */
+    flex: 1 1 auto; /* Shorthand for: flex-grow: 1, flex-shrink: 1, flex-basis: auto. */
+    min-height: 0; /* ADDED: Critical for a flex item that is also a flex container and should scroll */
     display: flex; /* Make it a flex container too */
     flex-direction: column; /* Arrange its children (messages, form) vertically */
 }
 
 #floating-chat-messages {
     /* This is the main scrollable area. It expands to fill available space within .chat-container. */
-    flex: 1 1 auto; /* Shorthand for: flex-grow: 1, flex-shrink: 1, flex-basis: auto.
-                       It will grow to fill remaining space, allowing it to take up height for scrolling. */
+    flex: 1; /* MODIFIED: Shorthand for: flex-grow: 1, flex-shrink: 1, flex-basis: 0. */
     overflow-y: auto; /* This makes the content scrollable vertically when it overflows its height. */
     padding: 15px; /* Added padding here for scrollable area */
     margin-bottom: 0; /* Ensures it plays well with flex-grow */
@@ -394,7 +393,8 @@ form button[type="submit"]:hover {
     border-radius: 15px; /* Default for all corners */
     margin-bottom: 8px; /* Slightly tighter spacing for messages */
     max-width: 75%; /* Limit width to prevent stretched messages */
-    word-wrap: break-word;
+    word-wrap: break-word; /* Preserves line breaks from AI output (deprecated but works) */
+    word-break: break-word; /* ADDED: Ensure long words break */
     white-space: pre-wrap; /* Ensures markdown formatting like line breaks are preserved */
     font-size: 0.95em;
     line-height: 1.5;

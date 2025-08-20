@@ -17,6 +17,9 @@ function renderChatMessages() {
         return;
     }
 
+    // Capture current scroll position if user has scrolled up
+    const isScrolledToBottom = floatingChatMessages.scrollHeight - floatingChatMessages.clientHeight <= floatingChatMessages.scrollTop + 1; // +1 for buffer
+
     floatingChatMessages.innerHTML = ''; // Clear existing messages
     conversationHistory.forEach(msg => {
         // Ensure msg.parts[0].text exists and handle markdown parsing for bot messages
@@ -27,8 +30,10 @@ function renderChatMessages() {
         msgDiv.innerHTML = marked.parse(messageText); // Parse markdown here
         floatingChatMessages.appendChild(msgDiv);
     });
-    // Scroll to the bottom of the chat
-    floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
+    // Scroll to the bottom of the chat ONLY if user was already at the bottom or it's a new message
+    if (isScrolledToBottom) {
+        floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
+    }
 }
 
 // Function to initialize/get chat session (Gemini API context)
@@ -322,19 +327,20 @@ document.addEventListener('DOMContentLoaded', () => {
             renderChatMessages(); 
 
             // Add a proactive message based on last generated report, only if applicable and not already displayed
-            const proactiveMessageText = `I see you recently generated a **${lastGeneratedReportType ? lastGeneratedReportType.charAt(0).toUpperCase() + lastGeneratedReportType.slice(1) : ''}** report. Do you have any questions about it?`;
-            
-            // Check if *any* proactive message exists in the UI already
-            const isProactiveMessageDisplayed = Array.from(floatingChatMessages.children).some(
-                (el) => el.classList.contains('proactive-message')
-            );
+            if (lastGeneratedReportType) {
+                const proactiveMessageText = `I see you recently generated a **${lastGeneratedReportType.charAt(0).toUpperCase() + lastGeneratedReportType.slice(1)}** report. Do you have any questions about it?`;
+                // Check if *any* proactive message exists in the UI already
+                const isProactiveMessageDisplayed = Array.from(floatingChatMessages.children).some(
+                    (el) => el.classList.contains('proactive-message')
+                );
 
-            // Only add the proactive message if a report type is set AND it hasn't been added yet
-            if (lastGeneratedReportType && !isProactiveMessageDisplayed) {
-                const proactiveMsgDiv = document.createElement('div');
-                proactiveMsgDiv.classList.add('message', 'bot-message', 'intro-message', 'proactive-message');
-                proactiveMsgDiv.innerHTML = marked.parse(proactiveMessageText);
-                floatingChatMessages.appendChild(proactiveMsgDiv);
+                // Only add the proactive message if a report type is set AND it hasn't been added yet
+                if (!isProactiveMessageDisplayed) {
+                    const proactiveMsgDiv = document.createElement('div');
+                    proactiveMsgDiv.classList.add('message', 'bot-message', 'intro-message', 'proactive-message');
+                    proactiveMsgDiv.innerHTML = marked.parse(proactiveMessageText);
+                    floatingChatMessages.appendChild(proactiveMsgDiv);
+                }
             }
             floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
         }
@@ -368,6 +374,9 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const chatSession = await getChatSession();
 
+            // Add user message to chatSession history for API call
+            conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
+
             const result = await chatSession.sendMessage(userMessage);
             const response = await result.response;
             const botReply = response.text();
@@ -378,8 +387,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 floatingChatMessages.removeChild(typingIndicator);
             }
 
-            // Update the local conversationHistory with the *full* history from the chat session
-            conversationHistory = await chatSession.getHistory();
+            // Update the local conversationHistory with the new bot reply
+            conversationHistory.push({ role: 'model', parts: [{ text: botReply }] });
 
             // Re-render all messages (including the new bot reply)
             renderChatMessages();
@@ -422,6 +431,8 @@ document.addEventListener('DOMContentLoaded', () => {
         pdfTemplate.style.display = 'block';
         pdfTemplate.style.position = 'absolute';
         pdfTemplate.style.left = '-9999px';
+        pdfTemplate.style.width = '210mm'; // Ensure A4 width for rendering
+        pdfTemplate.style.minHeight = '297mm'; // Ensure A4 height for rendering
 
         try {
             const canvas = await html2canvas(pdfTemplate, {
@@ -441,13 +452,15 @@ document.addEventListener('DOMContentLoaded', () => {
             pdfTemplate.style.display = 'none'; // Set to none immediately, then re-add hidden class
             pdfTemplate.style.position = 'static';
             pdfTemplate.classList.add('hidden'); // Re-add the hidden class
+            pdfTemplate.style.width = ''; // Reset width
+            pdfTemplate.style.minHeight = ''; // Reset min-height
 
             const imgData = canvas.toDataURL('image/jpeg', 0.9); // Use JPEG with 90% quality
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4'); // Portrait, millimeters, A4 size
 
-            const imgWidth = 210; // A4 width in mm
-            const pageHeight = 297; // A4 height in mm
+            const imgWidth = pdf.internal.pageSize.getWidth(); // A4 width in mm
+            const pageHeight = pdf.internal.pageSize.getHeight(); // A4 height in mm
             const imgHeight = (canvas.height * imgWidth) / canvas.width; // Height of the image stretched to A4 width
 
             console.log('PDF addImage dimensions: ', imgWidth, 'x', imgHeight);
@@ -483,6 +496,8 @@ document.addEventListener('DOMContentLoaded', () => {
             pdfTemplate.style.display = 'none';
             pdfTemplate.style.position = 'static';
             pdfTemplate.classList.add('hidden'); // Ensure hidden class is added back
+            pdfTemplate.style.width = ''; // Reset width
+            pdfTemplate.style.minHeight = ''; // Reset min-height
         }
     };
 });
