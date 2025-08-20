@@ -1,0 +1,3459 @@
+
+--- START FILE: combined.py ---
+
+import os
+
+def combine_files_to_single_file(root_dir, output_filename="combined_project_files.txt"):
+    """
+    Combines the content of all files in a directory into a single file,
+    excluding 'node_modules' directories and 'package-lock.json' files.
+
+    Args:
+        root_dir (str): The root directory of the project.
+        output_filename (str): The name of the output file.
+    """
+    combined_content = []
+    excluded_dirs = ['node_modules', '.git', '.vscode', '.idea', 'dist', 'build']
+    excluded_files = ['package-lock.json', 'yarn.lock', 'bun.lockb', '.env'] # Added .env as it might contain sensitive info
+
+    print(f"Starting to combine files from: {root_dir}")
+    print(f"Excluding directories: {excluded_dirs}")
+    print(f"Excluding files: {excluded_files}")
+
+    for dirpath, dirnames, filenames in os.walk(root_dir):
+        # Modify dirnames in-place to skip excluded directories
+        dirnames[:] = [d for d in dirnames if d not in excluded_dirs]
+
+        for filename in filenames:
+            if filename in excluded_files:
+                print(f"Skipping excluded file: {os.path.join(dirpath, filename)}")
+                continue
+
+            file_path = os.path.join(dirpath, filename)
+            # Make path relative to root_dir for the header
+            relative_file_path = os.path.relpath(file_path, root_dir)
+
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                combined_content.append(f"\n--- START FILE: {relative_file_path} ---\n\n")
+                combined_content.append(content)
+                combined_content.append(f"\n\n--- END FILE: {relative_file_path} ---\n")
+                print(f"Included file: {relative_file_path}")
+            except UnicodeDecodeError:
+                print(f"Skipping binary or undecodable file (UnicodeDecodeError): {relative_file_path}")
+            except Exception as e:
+                print(f"Error reading file {relative_file_path}: {e}")
+
+    output_path = os.path.join(root_dir, output_filename)
+    try:
+        with open(output_path, 'w', encoding='utf-8') as outfile:
+            outfile.write("".join(combined_content))
+        print(f"\nSuccessfully combined all files into: {output_path}")
+    except Exception as e:
+        print(f"Error writing output file {output_path}: {e}")
+
+if __name__ == "__main__":
+    # Get the current working directory where the script is run
+    # This assumes you run the script from your project's root directory
+    project_root = os.getcwd()
+    combine_files_to_single_file(project_root)
+
+
+--- END FILE: combined.py ---
+
+--- START FILE: data.txt ---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroMaestro AI - Your Cosmic Guide</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>AstroMaestro AI</h1>
+            <p>Unveiling the Cosmos, Deciphering Your Destiny</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <button onclick="showSection('astrology-section')">Astrology Report</button>
+            <button onclick="showSection('numerology-section')">Numerology Report</button>
+            <button onclick="showSection('chat-section')">AI Chat Assistant</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="astrology-section" class="active">
+            <h2>Your Astrological Blueprint</h2>
+            <p>Discover the secrets of your birth chart and unlock insights into your personality, potential, and life path.</p>
+            <form id="astrology-form">
+                <label for="astro-name">Your Name:</label>
+                <input type="text" id="astro-name" required>
+
+                <label for="astro-dob">Date of Birth:</label>
+                <input type="date" id="astro-dob" required>
+
+                <label for="astro-tob">Time of Birth:</label>
+                <input type="time" id="astro-tob" required>
+
+                <label for="astro-place">Place of Birth (City, Country):</label>
+                <input type="text" id="astro-place" placeholder="e.g., London, UK" required>
+
+                <label for="astro-system">Astrology System:</label>
+                <select id="astro-system" required>
+                    <option value="Western">Western Astrology</option>
+                    <option value="Vedic">Vedic (Indian) Astrology</option>
+                </select>
+
+                <button type="submit">Generate Astrology Report</button>
+            </form>
+            <div id="astrology-report-output" class="report-output">
+                <h3>Your Cosmic Revelation</h3>
+                <div class="report-content"></div>
+                <button class="download-pdf-btn hidden" onclick="downloadPdf('astrology')">Download as PDF</button>
+            </div>
+             <div id="astrology-pdf-template" class="pdf-template hidden">
+                <div class="pdf-header">
+                    <!-- IMPORTANT: Changed src to local path. Make sure you have 'images/logo.png' in your project! -->
+                    <img src="images/logo.png" alt="AstroMaestro AI Logo" class="pdf-logo">
+                    <h2>AstroMaestro AI</h2>
+                    <h3>Your Astrological Blueprint</h3>
+                </div>
+                <div class="pdf-content"></div>
+                <div class="pdf-footer">
+                    <p>Generated by AstroMaestro AI - Guiding Your Path</p>
+                    <p>For educational and entertainment purposes only.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="numerology-section">
+            <h2>Unveiling Your Numbers</h2>
+            <p>Explore the vibrational energies of your name and birth date through Chaldean or Pythagorean numerology.</p>
+            <form id="numerology-form">
+                <label for="nume-name">Your Full Name (as on birth certificate):</label>
+                <input type="text" id="nume-name" required>
+
+                <label for="nume-dob">Date of Birth:</label>
+                <input type="date" id="nume-dob" required>
+
+                <label for="nume-type">Numerology System:</label>
+                <select id="nume-type" required>
+                    <option value="Pythagorean">Pythagorean</option>
+                    <option value="Chaldean">Chaldean</option>
+                </select>
+
+                <button type="submit">Generate Numerology Report</button>
+            </form>
+            <div id="numerology-report-output" class="report-output">
+                <h3>Your Numerical Insight</h3>
+                <div class="report-content"></div>
+                <button class="download-pdf-btn hidden" onclick="downloadPdf('numerology')">Download as PDF</button>
+            </div>
+            <div id="numerology-pdf-template" class="pdf-template hidden">
+                 <div class="pdf-header">
+                    <!-- IMPORTANT: Changed src to local path. Make sure you have 'images/logo.png' in your project! -->
+                    <img src="images/logo.png" alt="AstroMaestro AI Logo" class="pdf-logo">
+                    <h2>AstroMaestro AI</h2>
+                    <h3>Your Numerological Insight</h3>
+                </div>
+                <div class="pdf-content"></div>
+                <div class="pdf-footer">
+                    <p>Generated by AstroMaestro AI - Guiding Your Path</p>
+                    <p>For educational and entertainment purposes only.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="chat-section">
+            <h2>AstroMaestro AI Chat Assistant</h2>
+            <p>Ask further questions about your reports, astrological concepts, or numerological interpretations.</p>
+            <div class="chat-container">
+                <div id="chat-messages" class="chat-messages">
+                    <div class="message bot-message">Hello! I am AstroMaestro AI. How may I assist you today regarding your reports or mystical knowledge?</div>
+                </div>
+                <form id="chat-form">
+                    <input type="text" id="chat-input" placeholder="Ask your question here..." required>
+                    <button type="submit">Send</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 AstroMaestro AI. All rights reserved.</p>
+            <p>Embrace the ancient wisdom, guided by modern insight.</p>
+        </div>
+    </footer>
+
+    <!-- Include Google's Generative AI JS SDK -->
+    <script type="module">
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+
+        // IMPORTANT: In a real application, NEVER expose your API key like this.
+        // Use a server-side proxy to keep your key secure.
+        const API_KEY = "AIzaSyCzx6ReMk8ohPJcCjGwHHzu7SvFccJqAbA"; // Your provided Gemini API Key
+        const MODEL_NAME = "gemini-2.5-flash-preview-05-20";
+
+        const genAI = new GoogleGenerativeAI(API_KEY);
+        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+
+        window.model = model; // Make the model accessible globally for script.js
+    </script>
+
+    <!-- Include jsPDF and html2canvas for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+------------------------------------------------------------------------------
+
+document.addEventListener('DOMContentLoaded', () => {
+    const astrologyForm = document.getElementById('astrology-form');
+    const numerologyForm = document.getElementById('numerology-form');
+    const chatForm = document.getElementById('chat-form');
+    const astrologyReportOutput = document.getElementById('astrology-report-output');
+    const numerologyReportOutput = document.getElementById('numerology-report-output');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+
+    // Function to switch sections
+    window.showSection = (sectionId) => {
+        document.querySelectorAll('section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById(sectionId).classList.add('active');
+    };
+
+    // Initialize the first section as active
+    showSection('astrology-section');
+
+    // --- Astrology Report Generation ---
+    astrologyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('astro-name').value;
+        const dob = document.getElementById('astro-dob').value;
+        const tob = document.getElementById('astro-tob').value;
+        const place = document.getElementById('astro-place').value;
+        const astroSystem = document.getElementById('astro-system').value; // Get the selected system
+
+        const reportContentDiv = astrologyReportOutput.querySelector('.report-content');
+        reportContentDiv.innerHTML = '<p>Generating your cosmic revelation... Please wait.</p>';
+        astrologyReportOutput.classList.add('active');
+        astrologyReportOutput.querySelector('.download-pdf-btn').classList.add('hidden'); // Hide download button during generation
+
+        try {
+            let astrologyPrompt = `Generate a comprehensive ${astroSystem} astrological birth chart report for ${name}, born on ${dob} at ${tob} in ${place}.`;
+
+            if (astroSystem === 'Vedic') {
+                astrologyPrompt += `
+                This report should adhere to Vedic (Indian) astrological principles. Include detailed interpretations for:
+                - **Planetary Placements (Grahas):** Sun (Surya), Moon (Chandra), Mars (Mangal), Mercury (Budha), Jupiter (Guru), Venus (Shukra), Saturn (Shani), Rahu, and Ketu. For each planet, describe its sign (Rashi) and house (Bhava) placement and its general influence on personality and life areas.
+                - **Ascendant (Lagna):** Interpret the rising sign and its profound impact on temperament and physical appearance.
+                - **Nakshatras:** For the Moon and Sun, identify their Nakshatra and provide a brief interpretation of its significance.
+                - **House (Bhava) Interpretations:** Briefly describe the general significance of each of the 12 houses (Dharmasthanas, Arthasthanas, Kamasthanas, Mokshasthanas) and how the planets placed within them might influence those life areas.
+                - **Yogas (Planetary Combinations):** Identify and briefly interpret any prominent beneficial or challenging Yogas formed by planetary combinations (e.g., Dhana Yoga, Raja Yoga, Kemadruma Yoga, Shakata Yoga), if applicable.
+                - **General Life Path & Destiny:** Provide an overarching summary of their life purpose, challenges, strengths, and areas of growth based on the complete chart.
+                `;
+            } else { // Western Astrology
+                astrologyPrompt += `
+                This report should adhere to Western astrological principles. Include detailed interpretations for:
+                - **Planetary Placements:** Sun, Moon, Ascendant, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, and Pluto. For each, describe its sign and house placement and its general influence on personality and life areas.
+                - **Major Aspects:** Briefly interpret key aspects between planets (e.g., conjunctions, oppositions, squares, trines, sextiles), highlighting their dynamic impact.
+                - **House Interpretations:** Describe the general significance of each of the 12 houses and how the planets placed within them might influence those life areas.
+                - **Elemental & Modal Balance:** Briefly discuss the balance of elements (Fire, Earth, Air, Water) and modalities (Cardinal, Fixed, Mutable) in the chart and what it suggests about their temperament.
+                - **General Life Path & Destiny:** Provide an overarching summary of their life purpose, challenges, strengths, and areas of growth based on the complete chart.
+                `;
+            }
+
+            astrologyPrompt += `
+            Maintain an inspiring, insightful, and mystical tone. Format the output using **Markdown** with clear, bold headings for each section (e.g., "## The Cosmic Core: Sun, Moon & Ascendant", "### Planetary Interpretations"), use bullet points for lists, and bold text for emphasis.`;
+            // Removed the AI-generated disclaimer from the prompt.
+
+            const result = await window.model.generateContent(astrologyPrompt);
+            const response = await result.response;
+            const text = response.text();
+
+            reportContentDiv.innerHTML = marked.parse(text);
+
+            // Append the fixed disclaimer AFTER the AI-generated content
+            const disclaimerText = `**Important Note:** This report is generated by an AI based on vast astrological knowledge and patterns. It provides interpretive insights and symbolic guidance. For precise astrological calculations (e.g., exact degrees, specific Dasha periods, precise house cusps) or a visual chart representation, consulting a professional astrologer with specialized software is recommended, as this AI does not perform live astronomical calculations or generate visual charts.`;
+            const disclaimerP = document.createElement('p');
+            disclaimerP.classList.add('ai-disclaimer');
+            disclaimerP.innerHTML = marked.parse(disclaimerText); // Parse disclaimer for markdown like bold
+            reportContentDiv.appendChild(disclaimerP);
+
+
+            astrologyReportOutput.querySelector('.download-pdf-btn').classList.remove('hidden');
+
+        } catch (error) {
+            console.error('Error generating astrology report:', error);
+            reportContentDiv.innerHTML = '<p class="error-message">Failed to generate report. Please try again. (Error: API communication issue)</p>';
+            astrologyReportOutput.querySelector('.download-pdf-btn').classList.add('hidden');
+        }
+    });
+
+    // --- Numerology Report Generation ---
+    numerologyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('nume-name').value;
+        const dob = document.getElementById('nume-dob').value;
+        const numeType = document.getElementById('nume-type').value;
+
+        const reportContentDiv = numerologyReportOutput.querySelector('.report-content');
+        reportContentDiv.innerHTML = '<p>Deciphering your numerical destiny... Please wait.</p>';
+        numerologyReportOutput.classList.add('active');
+        numerologyReportOutput.querySelector('.download-pdf-btn').classList.add('hidden'); // Hide download button during generation
+
+        try {
+            const prompt = `Generate a detailed ${numeType} numerology report for ${name}, born on ${dob}. 
+            Calculate and interpret the Life Path Number, Destiny Number (Expression Number), and Soul Urge Number (Heart's Desire Number). 
+            Explain what each number means for their personality, talents, challenges, and purpose in life. 
+            Provide the calculation steps briefly for each number if possible, or just the resulting number and its interpretation. 
+            Maintain an insightful and ancient tone, reflecting the wisdom of numbers. Format the output using **Markdown** with clear headings for each section (e.g., "## Life Path Number", "## Destiny Number", use bullet points for lists, and bold text for emphasis).`;
+
+            const result = await window.model.generateContent(prompt);
+            const response = await result.response;
+            const text = response.text();
+
+            reportContentDiv.innerHTML = marked.parse(text);
+
+            // Append the fixed disclaimer AFTER the AI-generated content for numerology too
+            const disclaimerText = `**Important Note:** This report is generated by an AI based on vast numerological knowledge and patterns. It provides interpretive insights and symbolic guidance. For precise numerical analysis, consulting a professional numerologist is recommended, as this AI does not perform live calculations or generate visual charts.`;
+            const disclaimerP = document.createElement('p');
+            disclaimerP.classList.add('ai-disclaimer');
+            disclaimerP.innerHTML = marked.parse(disclaimerText); // Parse disclaimer for markdown like bold
+            reportContentDiv.appendChild(disclaimerP);
+
+            numerologyReportOutput.querySelector('.download-pdf-btn').classList.remove('hidden');
+
+        } catch (error) {
+            console.error('Error generating numerology report:', error);
+            reportContentDiv.innerHTML = '<p class="error-message">Failed to generate report. Please try again. (Error: API communication issue)</p>';
+            numerologyReportOutput.querySelector('.download-pdf-btn').classList.add('hidden');
+        }
+    });
+
+    // --- AI Chat Assistant ---
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const userMessage = chatInput.value.trim();
+        if (!userMessage) return;
+
+        const userMsgDiv = document.createElement('div');
+        userMsgDiv.classList.add('message', 'user-message');
+        userMsgDiv.textContent = userMessage;
+        chatMessages.appendChild(userMsgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        chatInput.value = '';
+
+        const typingIndicator = document.createElement('div');
+        typingIndicator.classList.add('message', 'bot-message');
+        typingIndicator.innerHTML = '<em>AstroMaestro AI is thinking...</em>';
+        chatMessages.appendChild(typingIndicator);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        try {
+            const prompt = `You are AstroMaestro AI, an expert and mystical guide in astrology and numerology. Provide concise, helpful, and insightful answers. If the question is about a personal report, assume they are asking about a report they just generated (though you don't have direct memory of it, phrase it generally). Format your response using **Markdown** (e.g., bold for keywords, bullet points for lists if applicable).
+            User's question: "${userMessage}"`;
+
+            const result = await window.model.generateContent(prompt);
+            const response = await result.response;
+            const botReply = response.text();
+
+            chatMessages.removeChild(typingIndicator);
+
+            const botMsgDiv = document.createElement('div');
+            botMsgDiv.classList.add('message', 'bot-message');
+            botMsgDiv.innerHTML = marked.parse(botReply);
+            chatMessages.appendChild(botMsgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        } catch (error) {
+            console.error('Error in chat assistant:', error);
+            chatMessages.removeChild(typingIndicator);
+            const errorMsgDiv = document.createElement('div');
+            errorMsgDiv.classList.add('message', 'bot-message');
+            errorMsgDiv.innerHTML = '<em>Apologies, I encountered a cosmic disturbance. Please try again.</em>';
+            chatMessages.appendChild(errorMsgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    });
+
+    // --- PDF Download Functionality ---
+    window.downloadPdf = async (reportType) => {
+        let contentDivId, templateDivId, filename;
+        if (reportType === 'astrology') {
+            contentDivId = 'astrology-report-output';
+            templateDivId = 'astrology-pdf-template';
+            filename = 'AstroMaestro_Astrology_Report.pdf';
+        } else if (reportType === 'numerology') {
+            contentDivId = 'numerology-report-output';
+            templateDivId = 'numerology-pdf-template';
+            filename = 'AstroMaestro_Numerology_Report.pdf';
+        } else {
+            return;
+        }
+
+        const reportOutputHTML = document.getElementById(contentDivId).querySelector('.report-content').innerHTML;
+        const pdfTemplate = document.getElementById(templateDivId);
+        pdfTemplate.querySelector('.pdf-content').innerHTML = reportOutputHTML;
+
+        // Temporarily make the template visible off-screen for html2canvas to render
+        pdfTemplate.style.display = 'block';
+        pdfTemplate.style.position = 'absolute';
+        pdfTemplate.style.left = '-9999px';
+
+        try {
+            const canvas = await html2canvas(pdfTemplate, {
+                scale: 3, // Increased scale for better resolution in PDF
+                useCORS: true, // Keep this, useful for other external resources if any
+                logging: false // Disable logging for cleaner console
+            });
+
+            // Re-hide the template
+            pdfTemplate.style.display = 'none';
+            pdfTemplate.style.position = 'static';
+
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4'); // Portrait, millimeters, A4 size
+
+            const imgWidth = 210; // A4 width in mm
+            const pageHeight = 297; // A4 height in mm
+            const imgHeight = (canvas.height * imgWidth) / canvas.width; // Height of the image stretched to A4 width
+
+            let heightLeft = imgHeight;
+            let position = 0; // Tracks the current Y offset for adding image slice
+
+            // First page
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            // Subsequent pages
+            while (heightLeft > 0) {
+                position = position - pageHeight; // Shift the position up by one page height
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            pdf.save(filename);
+
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            alert('Failed to generate PDF. Please try again or check console for details.');
+        } finally {
+             // Ensure template is hidden even on error
+            pdfTemplate.style.display = 'none';
+            pdfTemplate.style.position = 'static';
+        }
+    };
+});
+
+----------------------------------------------------------------------------
+
+/* Basic Reset & Body Styling */
+body {
+    font-family: 'Playfair Display', serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom right, #0a0e1c, #1a0f2e, #2c1240); /* Deep cosmic gradient */
+    color: #f0e6da; /* Off-white for readability */
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 30px 0;
+    text-align: center;
+    border-bottom: 1px solid rgba(138, 43, 226, 0.3); /* Amethyst line */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 3.5em;
+    color: #e6c78e; /* Gold */
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+    margin-bottom: 5px;
+}
+
+header p {
+    font-size: 1.2em;
+    font-style: italic;
+    color: #d1b19a;
+}
+
+/* Navigation */
+nav {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px 0;
+    text-align: center;
+    border-bottom: 1px solid rgba(138, 43, 226, 0.3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+nav button {
+    background: #8a2be2; /* Amethyst */
+    color: #f0e6da;
+    border: none;
+    padding: 12px 25px;
+    margin: 0 10px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 1.1em;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+nav button:hover {
+    background: #9932cc; /* Darker amethyst */
+    transform: translateY(-2px);
+}
+
+nav button:active {
+    transform: translateY(0);
+}
+
+/* Main Content Sections */
+main {
+    flex-grow: 1; /* Allows main content to expand */
+    padding-top: 30px;
+    padding-bottom: 50px;
+}
+
+section {
+    background: rgba(10, 10, 20, 0.7); /* Slightly transparent dark background */
+    border-radius: 15px;
+    padding: 40px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(138, 43, 226, 0.4);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    display: none; /* Hidden by default */
+}
+
+section.active {
+    display: block; /* Show active section */
+}
+
+section h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5em;
+    color: #e6c78e;
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+section p {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+    color: #ccc;
+}
+
+/* Forms */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+form label {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1em;
+    color: #d1b19a;
+    margin-bottom: 5px;
+}
+
+form input[type="text"],
+form input[type="date"],
+form input[type="time"],
+form select {
+    padding: 12px 15px;
+    border: 1px solid #8a2be2;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #f0e6da;
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+form input[type="text"]:focus,
+form input[type="date"]:focus,
+form input[type="time"]:focus,
+form select:focus {
+    border-color: #e6c78e;
+    box-shadow: 0 0 8px rgba(230, 199, 142, 0.5);
+}
+
+/* Placeholder color for inputs */
+form input::placeholder {
+    color: #a090a0;
+}
+
+/* For date and time inputs in some browsers, colors might need specific overrides */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* Makes the icon white */
+}
+
+
+form button[type="submit"] {
+    background: #e6c78e; /* Gold */
+    color: #1a0f2e; /* Deep purple */
+    border: none;
+    padding: 15px 30px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 1.2em;
+    margin-top: 20px;
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+form button[type="submit"]:hover {
+    background: #f0d4a7; /* Lighter gold */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Report Output */
+.report-output {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(230, 199, 142, 0.5); /* Gold border */
+    border-radius: 10px;
+    margin-top: 40px;
+    padding: 30px;
+    box-shadow: inset 0 0 15px rgba(230, 199, 142, 0.2);
+    min-height: 200px;
+    display: none; /* Hidden by default */
+    position: relative;
+}
+
+.report-output.active {
+    display: block;
+}
+
+.report-output h3 {
+    font-family: 'Cinzel', serif;
+    color: #e6c78e;
+    font-size: 2em;
+    text-align: center;
+    margin-bottom: 25px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.report-content {
+    font-size: 1.1em;
+    color: #f0e6da;
+    line-height: 1.8;
+    white-space: pre-wrap; /* Preserves line breaks from AI output */
+    overflow-y: auto;
+    max-height: 400px; /* Limit height for long reports */
+    padding-right: 15px; /* Space for scrollbar */
+}
+
+/* Scrollbar styling */
+.report-content::-webkit-scrollbar {
+    width: 8px;
+}
+.report-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+.report-content::-webkit-scrollbar-thumb {
+    background: #8a2be2;
+    border-radius: 10px;
+}
+.report-content::-webkit-scrollbar-thumb:hover {
+    background: #9932cc;
+}
+
+
+.download-pdf-btn {
+    background: #28a745; /* Green for download */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 1em;
+    margin-top: 25px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    transition: background 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.download-pdf-btn:hover {
+    background: #218838;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Chat Assistant */
+.chat-container {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(138, 43, 226, 0.5);
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 500px; /* Fixed height for chat window */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 15px; /* Space for scrollbar */
+    margin-bottom: 15px;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 8px;
+}
+.chat-messages::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #8a2be2;
+    border-radius: 10px;
+}
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #9932cc;
+}
+
+
+.message {
+    padding: 10px 15px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.user-message {
+    background: #8a2be2; /* Amethyst for user */
+    align-self: flex-end;
+    margin-left: auto;
+    text-align: right;
+}
+
+.bot-message {
+    background: #333; /* Darker grey for bot */
+    align-self: flex-start;
+    margin-right: auto;
+    border: 1px solid #555;
+}
+
+#chat-form {
+    display: flex;
+    gap: 10px;
+}
+
+#chat-input {
+    flex-grow: 1;
+    padding: 12px 15px;
+    border: 1px solid #8a2be2;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #f0e6da;
+    font-size: 1em;
+    outline: none;
+}
+
+#chat-form button {
+    background: #e6c78e;
+    color: #1a0f2e;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 1em;
+    transition: background 0.3s ease;
+}
+
+#chat-form button:hover {
+    background: #f0d4a7;
+}
+
+/* Footer */
+footer {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 20px 0;
+    text-align: center;
+    border-top: 1px solid rgba(138, 43, 226, 0.3);
+    color: #ccc;
+    font-size: 0.9em;
+    margin-top: auto; /* Pushes footer to the bottom */
+}
+
+footer p {
+    margin: 5px 0;
+}
+
+/* PDF Template Styling (Hidden on regular page) */
+.pdf-template {
+    background: #f0e6da; /* Light background for PDF */
+    color: #1a0f2e; /* Dark text for PDF */
+    font-family: 'Playfair Display', serif;
+    padding: 40px;
+    box-sizing: border-box; /* Include padding in element's total width and height */
+    width: 210mm; /* A4 width */
+    min-height: 297mm; /* A4 height */
+}
+
+.pdf-header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #8a2be2;
+    padding-bottom: 20px;
+}
+
+.pdf-logo {
+    width: 80px;
+    height: 80px;
+    display: block;
+    margin: 0 auto 10px;
+}
+
+.pdf-header h2 {
+    font-family: 'Cinzel', serif;
+    color: #8a2be2;
+    font-size: 2.8em;
+    margin: 0;
+}
+
+.pdf-header h3 {
+    font-family: 'Playfair Display', serif;
+    color: #e6c78e;
+    font-size: 1.5em;
+    margin: 5px 0 0;
+    font-style: italic;
+}
+
+.pdf-content {
+    font-size: 1.1em;
+    line-height: 1.7;
+    text-align: justify;
+    padding: 0 20px;
+}
+
+.pdf-content p {
+    margin-bottom: 1em;
+}
+
+.pdf-footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #ccc;
+    font-size: 0.9em;
+    color: #555;
+}
+
+/* Report Content & Chat Message General Text Styling */
+.report-content,
+.chat-messages .message {
+    font-size: 1.1em;
+    color: #f0e6da;
+    line-height: 1.8;
+}
+
+/* Markdown Headings in Reports and Chat */
+.report-content h1,
+.report-content h2,
+.report-content h3,
+.chat-messages .message h1,
+.chat-messages .message h2,
+.chat-messages .message h3 {
+    font-family: 'Cinzel', serif;
+    color: #e6c78e; /* Gold */
+    margin-top: 1.5em;
+    margin-bottom: 0.8em;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    line-height: 1.3;
+}
+
+.report-content h1,
+.chat-messages .message h1 { font-size: 2em; text-align: center; } /* Main report titles within content */
+.report-content h2,
+.chat-messages .message h2 { font-size: 1.8em; }
+.report-content h3,
+.chat-messages .message h3 { font-size: 1.5em; }
+
+/* Paragraphs */
+.report-content p,
+.chat-messages .message p {
+    margin-bottom: 1em;
+}
+
+/* Lists */
+.report-content ul,
+.report-content ol,
+.chat-messages .message ul,
+.chat-messages .message ol {
+    margin-left: 20px;
+    margin-bottom: 1em;
+    padding-left: 10px;
+}
+
+.report-content li,
+.chat-messages .message li {
+    margin-bottom: 0.5em;
+}
+
+/* Strong/Bold text */
+.report-content strong,
+.chat-messages .message strong {
+    color: #e6c78e; /* Make bold text gold for emphasis */
+    font-weight: 700; /* Ensure it's truly bold */
+}
+
+/* Emphasis/Italic text */
+.report-content em,
+.chat-messages .message em {
+    color: #d1b19a; /* A slightly softer gold/bronze for italics */
+    font-style: italic;
+}
+
+/* Blockquotes */
+.report-content blockquote,
+.chat-messages .message blockquote {
+    border-left: 4px solid #8a2be2; /* Amethyst border */
+    padding-left: 15px;
+    margin: 1em 0;
+    font-style: italic;
+    color: #bbb;
+}
+
+/* Code blocks (if used by AI) */
+.report-content pre,
+.chat-messages .message pre {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-family: monospace;
+    font-size: 0.9em;
+    border: 1px solid rgba(138, 43, 226, 0.3);
+}
+
+.report-content code,
+.chat-messages .message code {
+    background: rgba(138, 43, 226, 0.2);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+    color: #f0e6da;
+}
+
+/* Adjustments for PDF template to ensure markdown also looks good */
+.pdf-content h1,
+.pdf-content h2,
+.pdf-content h3 {
+    font-family: 'Cinzel', serif;
+    color: #8a2be2; /* Amethyst for headings in PDF */
+    margin-top: 1.2em;
+    margin-bottom: 0.6em;
+}
+.pdf-content h1 { font-size: 2.2em; text-align: center; }
+.pdf-content h2 { font-size: 1.8em; }
+.pdf-content h3 { font-size: 1.5em; }
+
+.pdf-content p {
+    margin-bottom: 0.8em;
+    color: #333; /* Darker text for readability in PDF */
+}
+
+.pdf-content ul,
+.pdf-content ol {
+    margin-left: 25px;
+    margin-bottom: 0.8em;
+    color: #333;
+}
+
+.pdf-content li {
+    margin-bottom: 0.4em;
+}
+
+.pdf-content strong {
+    font-weight: bold;
+    color: #8a2be2; /* Amethyst for bold in PDF */
+}
+
+.pdf-content em {
+    font-style: italic;
+    color: #555;
+}
+
+.pdf-content blockquote {
+    border-left: 4px solid #8a2be2;
+    padding-left: 15px;
+    margin: 1em 0;
+    font-style: italic;
+    color: #666;
+}
+.pdf-content pre {
+    background: #eee;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-family: monospace;
+    font-size: 0.9em;
+    border: 1px solid #ccc;
+    color: #333;
+}
+.pdf-content code {
+    background: #e0e0e0;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+    color: #333;
+}
+
+
+/* --- Mobile Responsiveness --- */
+
+/* Small tablets and larger phones (up to 768px) */
+@media screen and (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    header h1 {
+        font-size: 2.8em;
+    }
+
+    header p {
+        font-size: 1em;
+    }
+
+    nav button {
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 1em;
+    }
+
+    section {
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+
+    section h2 {
+        font-size: 2em;
+    }
+
+    section p {
+        font-size: 1em;
+    }
+
+    form {
+        gap: 12px;
+    }
+
+    form label {
+        font-size: 1em;
+    }
+
+    form input,
+    form select {
+        padding: 10px 12px;
+        font-size: 0.95em;
+    }
+
+    form button[type="submit"] {
+        padding: 12px 25px;
+        font-size: 1.1em;
+    }
+
+    .report-output {
+        padding: 20px;
+    }
+
+    .report-output h3 {
+        font-size: 1.8em;
+    }
+
+    .report-content {
+        font-size: 1em;
+        line-height: 1.7;
+        max-height: 350px; /* Adjust max-height for smaller screens */
+    }
+
+    .chat-container {
+        height: 450px; /* Adjust chat height */
+        padding: 15px;
+    }
+
+    .message {
+        padding: 8px 12px;
+        font-size: 0.95em;
+    }
+
+    #chat-input {
+        padding: 10px 12px;
+        font-size: 0.95em;
+    }
+
+    #chat-form button {
+        padding: 10px 20px;
+        font-size: 0.95em;
+    }
+}
+
+/* Smaller phones (up to 480px) */
+@media screen and (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+
+    header {
+        padding: 20px 0;
+    }
+
+    header h1 {
+        font-size: 2em;
+    }
+
+    header p {
+        font-size: 0.9em;
+    }
+
+    nav .container {
+        display: flex;
+        flex-direction: column; /* Stack buttons vertically */
+        gap: 10px;
+    }
+
+    nav button {
+        width: calc(100% - 20px); /* Full width minus padding */
+        margin: 0; /* Remove horizontal margin */
+        font-size: 0.9em;
+        padding: 10px;
+    }
+
+    section {
+        padding: 15px;
+    }
+
+    section h2 {
+        font-size: 1.5em;
+    }
+
+    section p {
+        font-size: 0.9em;
+        margin-bottom: 20px;
+    }
+
+    form {
+        gap: 10px;
+    }
+
+    form label {
+        font-size: 0.9em;
+    }
+
+    form input,
+    form select {
+        padding: 8px 10px;
+        font-size: 0.9em;
+    }
+
+    form button[type="submit"] {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+
+    .report-output {
+        padding: 15px;
+    }
+
+    .report-output h3 {
+        font-size: 1.5em;
+    }
+
+    .report-content {
+        font-size: 0.9em;
+        line-height: 1.6;
+        max-height: 300px; /* Further adjust max-height */
+    }
+
+    .download-pdf-btn {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+
+    .chat-container {
+        height: 350px; /* Even smaller chat height */
+        padding: 10px;
+    }
+
+    .message {
+        padding: 7px 10px;
+        font-size: 0.85em;
+        max-width: 90%; /* Allow messages to take more width */
+    }
+
+    #chat-form {
+        flex-direction: column; /* Stack chat input and button */
+        gap: 8px;
+    }
+
+    #chat-input {
+        padding: 8px 10px;
+        font-size: 0.9em;
+        border-radius: 20px;
+    }
+
+    #chat-form button {
+        padding: 8px 15px;
+        font-size: 0.9em;
+        border-radius: 20px;
+    }
+
+    footer {
+        padding: 15px 0;
+        font-size: 0.8em;
+    }
+}
+
+/* New style for the fixed AI disclaimer in reports */
+.ai-disclaimer {
+    font-size: 0.9em;
+    color: #a0a0a0; /* Softer grey */
+    text-align: center;
+    margin-top: 30px; /* Space it out from the report content */
+    padding-top: 20px;
+    border-top: 1px dashed rgba(138, 43, 226, 0.3); /* A subtle divider */
+    font-style: italic;
+    line-height: 1.5;
+}
+
+/* Ensure markdown within the disclaimer also looks good */
+.ai-disclaimer strong {
+    color: #e6c78e; /* Gold for bold within disclaimer */
+    font-weight: bold;
+}
+
+/* Also apply to PDF version of the disclaimer */
+.pdf-content .ai-disclaimer {
+    color: #555; /* Darker grey for PDF readability */
+    border-top: 1px dashed #ccc;
+}
+
+.pdf-content .ai-disclaimer strong {
+    color: #8a2be2; /* Amethyst for bold in PDF disclaimer */
+}
+
+---------------------------------------------------------------------------
+
+index.mjs:6923 modal.ts injected
+index.mjs:2367 [bg:index]: Hello World
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:51:42 GMT+0530 (India Standard Time)
+index.mjs:2367 [update-handler]: Extension updated: 3.0.18 --> 3.0.19
+index.mjs:6851 Extension update from 3.0.18 --> 3.0.19
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:52:06 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:52:59 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:53:09 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:53:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:53:44 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:54:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:54:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:54:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:55:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:55:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:55:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:56:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:56:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:56:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:57:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:57:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:57:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:58:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:58:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:58:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147288942.undefined]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288942.undefined
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:59:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:59:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:59:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:00:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:00:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147288993.undefined]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: [remote@1147288993.9]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.9
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.undefined
+index.mjs:2367 [bg:index]: [remote@1147288993.10]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: [remote@1147288993.12]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: [remote@1147288993.13]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: [remote@1147288993.14]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: [remote@1147288993.15]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: [remote@1147288993.17]-[page:captions]:  Array(1)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:00:46 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.10
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.13
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.12
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.15
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.14
+index.mjs:2367 [bg:index]: [remote@1147288993.18]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: [remote@1147288993.19]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: [remote@1147288993.20]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.17
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.18
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.19
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.20
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:01:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:01:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:01:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:02:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:02:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:02:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:03:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:03:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:03:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:04:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:04:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147288998.undefined]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288998.undefined
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:04:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:05:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:05:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:05:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:06:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:06:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:06:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:07:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:07:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:07:44 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:08:03 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289005.undefined]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289005.undefined
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:08:28 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:08:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:09:05 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:09:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:09:44 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:10:03 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289009.undefined]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289009.undefined
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:10:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:10:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:11:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:11:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:11:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:12:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:12:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:12:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:13:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:13:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:13:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:14:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:14:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:14:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:15:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:15:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:15:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:16:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:16:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:16:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:17:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:17:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:17:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:18:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:18:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289014.undefined
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289014.34
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:18:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:19:03 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289014.36
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:19:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:19:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:20:03 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:20:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:20:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:21:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:21:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:21:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:22:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:22:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:22:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:23:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:23:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:23:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:24:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:24:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:24:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:25:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:25:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:25:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289005.undefined]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289005.undefined
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:26:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:26:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:26:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:27:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:27:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:27:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:28:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:28:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:28:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:29:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:29:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:29:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:30:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:30:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:30:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:31:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:31:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:31:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:32:03 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:32:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:32:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:33:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:33:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:33:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:34:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:34:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:34:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:35:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:35:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:35:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:36:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:36:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:36:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:37:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:37:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:37:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:38:03 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:38:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:38:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:39:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:39:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:39:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:40:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:40:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:40:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:41:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:41:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:41:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:42:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:42:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:42:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:43:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:43:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:43:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:44:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:44:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:44:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:45:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:45:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:45:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:46:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:46:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:46:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:47:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:47:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:47:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:48:03 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:48:24 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:48:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:49:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:49:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:49:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:50:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:50:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:50:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:51:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:51:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:51:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:52:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:52:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:52:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:53:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:53:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:53:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:54:03 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:54:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:54:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:55:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:55:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:55:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:56:03 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:56:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:56:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:57:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:57:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289005.undefined]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289005.undefined
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:57:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:58:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:58:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:58:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:59:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:59:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:59:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:00:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:00:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:00:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:01:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:01:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:01:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289032.undefined]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289032.undefined
+index.mjs:2367 [bg:index]: [remote@1147289032.undefined]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289032.undefined
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:02:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:02:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289038.undefined]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289038.undefined
+index.mjs:2367 [bg:index]: [remote@1147289038.57]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289038.57
+index.mjs:2367 [bg:index]: [remote@1147289038.59]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289038.59
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:02:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:03:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:03:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:03:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:04:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:04:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:04:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:05:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:05:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:05:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:06:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:06:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:06:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:07:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:07:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:07:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:08:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:08:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:08:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:09:03 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289005.undefined]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289005.undefined
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:09:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:09:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:10:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:10:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:10:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:11:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:11:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:11:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:12:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:12:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:12:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:13:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:13:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:13:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:14:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:14:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:14:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:15:04 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:15:23 GMT+0530 (India Standard Time)
+early-page.js:6602 [cs:early-page]: Running on page: http://localhost:8080/ top=true
+early-page.js:6602 [cs:early-page]: Assigned globalThis.twoseven
+index.mjs:2367 [bg:index]: [remote@1147289005.undefined]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289005.undefined
+ TypeError: Cannot read properties of undefined (reading 'profile')
+    at onUpdate-profile (chrome-extension://cjdnfmjmdligcpfcekfmenlhiopehjkd/dist/contentScripts/views/modal/assets/index-CUHM8_N7.js:72853:26)
+logError @ chrome-extension://c…ex-CUHM8_N7.js:1639
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:15:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:16:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:16:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:16:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:17:03 GMT+0530 (India Standard Time)
+hook.js:608 Error generating PDF: Error: Incomplete or corrupt PNG file
+    at new i (png.js:209:15)
+    at t.processPNG (png_support.js:311:15)
+    at Object.P (addimage.js:919:40)
+    at t.addImage (addimage.js:855:34)
+    at window.downloadPdf (script.js:221:17)
+overrideMethod @ hook.js:608
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:17:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:17:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289038.71]-[page:captions]:  ['Setting up captions-detector... top=false']
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289038.71
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:18:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:18:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:18:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:19:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:19:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:19:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:20:03 GMT+0530 (India Standard Time)
+index-CUHM8_N7.js:1639 TypeError: Cannot read properties of undefined (reading 'profile')
+    at onUpdate-profile (index-CUHM8_N7.js:72853:26)
+logError @ index-CUHM8_N7.js:1639
+handleError @ index-CUHM8_N7.js:1635
+(anonymous) @ index-CUHM8_N7.js:1592
+Promise.catch
+callWithAsyncErrorHandling @ index-CUHM8_N7.js:1591
+emit @ index-CUHM8_N7.js:6302
+updateProfile @ index-CUHM8_N7.js:72560
+(anonymous) @ index-CUHM8_N7.js:72591
+(anonymous) @ index-CUHM8_N7.js:2634
+callWithErrorHandling @ index-CUHM8_N7.js:1582
+callWithAsyncErrorHandling @ index-CUHM8_N7.js:1589
+hook.__weh.hook.__weh @ index-CUHM8_N7.js:2619
+flushPostFlushCbs @ index-CUHM8_N7.js:1734
+render2 @ index-CUHM8_N7.js:5875
+mount @ index-CUHM8_N7.js:3444
+app.mount @ index-CUHM8_N7.js:9297
+(anonymous) @ index-CUHM8_N7.js:72860
+assets/index-CUHM8_N7.js @ index-CUHM8_N7.js:72867
+__require @ index-CUHM8_N7.js:3
+(anonymous) @ index-CUHM8_N7.js:72870
+script.js:235 Error generating PDF: Error: Incomplete or corrupt PNG file
+    at new i (png.js:209:15)
+    at t.processPNG (png_support.js:311:15)
+    at Object.P (addimage.js:919:40)
+    at t.addImage (addimage.js:855:34)
+    at window.downloadPdf (script.js:221:17)
+overrideMethod @ hook.js:608
+window.downloadPdf @ script.js:235
+await in window.downloadPdf
+onclick @ (index):54
+script.js:235 Error generating PDF: Error: Incomplete or corrupt PNG file
+    at new i (png.js:209:15)
+    at t.processPNG (png_support.js:311:15)
+    at Object.P (addimage.js:919:40)
+    at t.addImage (addimage.js:855:34)
+    at window.downloadPdf (script.js:221:17)
+overrideMethod @ hook.js:608
+window.downloadPdf @ script.js:235
+await in window.downloadPdf
+onclick @ (index):54
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:20:23 GMT+0530 (India Standard Time)
+early-index.js:437 Uncaught (in promise) TypeError: Cannot read properties of null (reading 'postMessage')
+    at postTo (early-index.js:437:18)
+    at early-index.js:461:9
+postTo @ early-index.js:437
+(anonymous) @ early-index.js:461
+early-index.js:437 Uncaught (in promise) TypeError: Cannot read properties of null (reading 'postMessage')
+    at postTo (early-index.js:437:18)
+    at early-index.js:461:9
+postTo @ early-index.js:437
+(anonymous) @ early-index.js:461
+
+
+--- END FILE: data.txt ---
+
+--- START FILE: index.html ---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroMaestro AI - Your Cosmic Guide</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>AstroMaestro AI</h1>
+            <p>Unveiling the Cosmos, Deciphering Your Destiny</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <button onclick="showSection('astrology-section')">Astrology Report</button>
+            <button onclick="showSection('numerology-section')">Numerology Report</button>
+            <button onclick="showSection('chat-section')">AI Chat Assistant</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="astrology-section" class="active">
+            <h2>Your Astrological Blueprint</h2>
+            <p>Discover the secrets of your birth chart and unlock insights into your personality, potential, and life path.</p>
+            <form id="astrology-form">
+                <label for="astro-name">Your Name:</label>
+                <input type="text" id="astro-name" required>
+
+                <label for="astro-dob">Date of Birth:</label>
+                <input type="date" id="astro-dob" required>
+
+                <label for="astro-tob">Time of Birth:</label>
+                <input type="time" id="astro-tob" required>
+
+                <label for="astro-place">Place of Birth (City, Country):</label>
+                <input type="text" id="astro-place" placeholder="e.g., London, UK" required>
+
+                <label for="astro-system">Astrology System:</label>
+                <select id="astro-system" required>
+                    <option value="Western">Western Astrology</option>
+                    <option value="Vedic">Vedic (Indian) Astrology</option>
+                </select>
+
+                <button type="submit">Generate Astrology Report</button>
+            </form>
+            <div id="astrology-report-output" class="report-output">
+                <h3>Your Cosmic Revelation</h3>
+                <div class="report-content"></div>
+                <button class="download-pdf-btn hidden" onclick="downloadPdf('astrology')">Download as PDF</button>
+            </div>
+             <div id="astrology-pdf-template" class="pdf-template hidden">
+                <div class="pdf-header">
+                    <!-- IMPORTANT: Changed src to local path. Make sure you have 'images/logo.png' in your project! -->
+                    <img src="logo.png" alt="AstroMaestro AI Logo" class="pdf-logo">
+                    <h2>AstroMaestro AI</h2>
+                    <h3>Your Astrological Blueprint</h3>
+                </div>
+                <div class="pdf-content"></div>
+                <div class="pdf-footer">
+                    <p>Generated by AstroMaestro AI - Guiding Your Path</p>
+                    <p>For educational and entertainment purposes only.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="numerology-section">
+            <h2>Unveiling Your Numbers</h2>
+            <p>Explore the vibrational energies of your name and birth date through Chaldean or Pythagorean numerology.</p>
+            <form id="numerology-form">
+                <label for="nume-name">Your Full Name (as on birth certificate):</label>
+                <input type="text" id="nume-name" required>
+
+                <label for="nume-dob">Date of Birth:</label>
+                <input type="date" id="nume-dob" required>
+
+                <label for="nume-type">Numerology System:</label>
+                <select id="nume-type" required>
+                    <option value="Pythagorean">Pythagorean</option>
+                    <option value="Chaldean">Chaldean</option>
+                </select>
+
+                <button type="submit">Generate Numerology Report</button>
+            </form>
+            <div id="numerology-report-output" class="report-output">
+                <h3>Your Numerical Insight</h3>
+                <div class="report-content"></div>
+                <button class="download-pdf-btn hidden" onclick="downloadPdf('numerology')">Download as PDF</button>
+            </div>
+            <div id="numerology-pdf-template" class="pdf-template hidden">
+                 <div class="pdf-header">
+                    <!-- IMPORTANT: Changed src to local path. Make sure you have 'images/logo.png' in your project! -->
+                    <img src="logo.png" alt="AstroMaestro AI Logo" class="pdf-logo">
+                    <h2>AstroMaestro AI</h2>
+                    <h3>Your Numerological Insight</h3>
+                </div>
+                <div class="pdf-content"></div>
+                <div class="pdf-footer">
+                    <p>Generated by AstroMaestro AI - Guiding Your Path</p>
+                    <p>For educational and entertainment purposes only.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="chat-section">
+            <h2>AstroMaestro AI Chat Assistant</h2>
+            <p>Ask further questions about your reports, astrological concepts, or numerological interpretations.</p>
+            <div class="chat-container">
+                <div id="chat-messages" class="chat-messages">
+                    <div class="message bot-message">Hello! I am AstroMaestro AI. How may I assist you today regarding your reports or mystical knowledge?</div>
+                </div>
+                <form id="chat-form">
+                    <input type="text" id="chat-input" placeholder="Ask your question here..." required>
+                    <button type="submit">Send</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 AstroMaestro AI. All rights reserved.</p>
+            <p>Embrace the ancient wisdom, guided by modern insight.</p>
+        </div>
+    </footer>
+
+    <!-- Include Google's Generative AI JS SDK -->
+    <script type="module">
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+
+        // IMPORTANT: In a real application, NEVER expose your API key like this.
+        // Use a server-side proxy to keep your key secure.
+        const API_KEY = "AIzaSyCzx6ReMk8ohPJcCjGwHHzu7SvFccJqAbA"; // Your provided Gemini API Key
+        const MODEL_NAME = "gemini-2.5-flash-preview-05-20";
+
+        const genAI = new GoogleGenerativeAI(API_KEY);
+        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+
+        window.model = model; // Make the model accessible globally for script.js
+    </script>
+
+    <!-- Include jsPDF and html2canvas for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+--- END FILE: index.html ---
+
+--- START FILE: script.js ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    const astrologyForm = document.getElementById('astrology-form');
+    const numerologyForm = document.getElementById('numerology-form');
+    const chatForm = document.getElementById('chat-form');
+    const astrologyReportOutput = document.getElementById('astrology-report-output');
+    const numerologyReportOutput = document.getElementById('numerology-report-output');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+
+    // Function to switch sections
+    window.showSection = (sectionId) => {
+        document.querySelectorAll('section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById(sectionId).classList.add('active');
+    };
+
+    // Initialize the first section as active
+    showSection('astrology-section');
+
+    // --- Astrology Report Generation ---
+    astrologyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('astro-name').value;
+        const dob = document.getElementById('astro-dob').value;
+        const tob = document.getElementById('astro-tob').value;
+        const place = document.getElementById('astro-place').value;
+        const astroSystem = document.getElementById('astro-system').value; // Get the selected system
+
+        const reportContentDiv = astrologyReportOutput.querySelector('.report-content');
+        reportContentDiv.innerHTML = '<p>Generating your cosmic revelation... Please wait.</p>';
+        astrologyReportOutput.classList.add('active');
+        astrologyReportOutput.querySelector('.download-pdf-btn').classList.add('hidden'); // Hide download button during generation
+
+        try {
+            let astrologyPrompt = `Generate a comprehensive ${astroSystem} astrological birth chart report for ${name}, born on ${dob} at ${tob} in ${place}.`;
+
+            if (astroSystem === 'Vedic') {
+                astrologyPrompt += `
+                This report should adhere to Vedic (Indian) astrological principles. Include detailed interpretations for:
+                - **Planetary Placements (Grahas):** Sun (Surya), Moon (Chandra), Mars (Mangal), Mercury (Budha), Jupiter (Guru), Venus (Shukra), Saturn (Shani), Rahu, and Ketu. For each planet, describe its sign (Rashi) and house (Bhava) placement and its general influence on personality and life areas.
+                - **Ascendant (Lagna):** Interpret the rising sign and its profound impact on temperament and physical appearance.
+                - **Nakshatras:** For the Moon and Sun, identify their Nakshatra and provide a brief interpretation of its significance.
+                - **House (Bhava) Interpretations:** Briefly describe the general significance of each of the 12 houses (Dharmasthanas, Arthasthanas, Kamasthanas, Mokshasthanas) and how the planets placed within them might influence those life areas.
+                - **Yogas (Planetary Combinations):** Identify and briefly interpret any prominent beneficial or challenging Yogas formed by planetary combinations (e.g., Dhana Yoga, Raja Yoga, Kemadruma Yoga, Shakata Yoga), if applicable.
+                - **General Life Path & Destiny:** Provide an overarching summary of their life purpose, challenges, strengths, and areas of growth based on the complete chart.
+                `;
+            } else { // Western Astrology
+                astrologyPrompt += `
+                This report should adhere to Western astrological principles. Include detailed interpretations for:
+                - **Planetary Placements:** Sun, Moon, Ascendant, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, and Pluto. For each, describe its sign and house placement and its general influence on personality and life areas.
+                - **Major Aspects:** Briefly interpret key aspects between planets (e.g., conjunctions, oppositions, squares, trines, sextiles), highlighting their dynamic impact.
+                - **House Interpretations:** Describe the general significance of each of the 12 houses and how the planets placed within them might influence those life areas.
+                - **Elemental & Modal Balance:** Briefly discuss the balance of elements (Fire, Earth, Air, Water) and modalities (Cardinal, Fixed, Mutable) in the chart and what it suggests about their temperament.
+                - **General Life Path & Destiny:** Provide an overarching summary of their life purpose, challenges, strengths, and areas of growth based on the complete chart.
+                `;
+            }
+
+            astrologyPrompt += `
+            Maintain an inspiring, insightful, and mystical tone. Format the output using **Markdown** with clear, bold headings for each section (e.g., "## The Cosmic Core: Sun, Moon & Ascendant", "### Planetary Interpretations"), use bullet points for lists, and bold text for emphasis.`;
+            // Removed the AI-generated disclaimer from the prompt.
+
+            const result = await window.model.generateContent(astrologyPrompt);
+            const response = await result.response;
+            const text = response.text();
+
+            reportContentDiv.innerHTML = marked.parse(text);
+
+            // Append the fixed disclaimer AFTER the AI-generated content
+            const disclaimerText = `**Important Note:** This report is generated by an AI based on vast astrological knowledge and patterns. It provides interpretive insights and symbolic guidance. For precise astrological calculations (e.g., exact degrees, specific Dasha periods, precise house cusps) or a visual chart representation, consulting a professional astrologer with specialized software is recommended, as this AI does not perform live astronomical calculations or generate visual charts.`;
+            const disclaimerP = document.createElement('p');
+            disclaimerP.classList.add('ai-disclaimer');
+            disclaimerP.innerHTML = marked.parse(disclaimerText); // Parse disclaimer for markdown like bold
+            reportContentDiv.appendChild(disclaimerP);
+
+
+            astrologyReportOutput.querySelector('.download-pdf-btn').classList.remove('hidden');
+
+        } catch (error) {
+            console.error('Error generating astrology report:', error);
+            reportContentDiv.innerHTML = '<p class="error-message">Failed to generate report. Please try again. (Error: API communication issue)</p>';
+            astrologyReportOutput.querySelector('.download-pdf-btn').classList.add('hidden');
+        }
+    });
+
+    // --- Numerology Report Generation ---
+    numerologyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('nume-name').value;
+        const dob = document.getElementById('nume-dob').value;
+        const numeType = document.getElementById('nume-type').value;
+
+        const reportContentDiv = numerologyReportOutput.querySelector('.report-content');
+        reportContentDiv.innerHTML = '<p>Deciphering your numerical destiny... Please wait.</p>';
+        numerologyReportOutput.classList.add('active');
+        numerologyReportOutput.querySelector('.download-pdf-btn').classList.add('hidden'); // Hide download button during generation
+
+        try {
+            const prompt = `Generate a detailed ${numeType} numerology report for ${name}, born on ${dob}. 
+            Calculate and interpret the Life Path Number, Destiny Number (Expression Number), and Soul Urge Number (Heart's Desire Number). 
+            Explain what each number means for their personality, talents, challenges, and purpose in life. 
+            Provide the calculation steps briefly for each number if possible, or just the resulting number and its interpretation. 
+            Maintain an insightful and ancient tone, reflecting the wisdom of numbers. Format the output using **Markdown** with clear headings for each section (e.g., "## Life Path Number", "## Destiny Number", use bullet points for lists, and bold text for emphasis).`;
+
+            const result = await window.model.generateContent(prompt);
+            const response = await result.response;
+            const text = response.text();
+
+            reportContentDiv.innerHTML = marked.parse(text);
+
+            // Append the fixed disclaimer AFTER the AI-generated content for numerology too
+            const disclaimerText = `**Important Note:** This report is generated by an AI based on vast numerological knowledge and patterns. It provides interpretive insights and symbolic guidance. For precise numerical analysis, consulting a professional numerologist is recommended, as this AI does not perform live calculations or generate visual charts.`;
+            const disclaimerP = document.createElement('p');
+            disclaimerP.classList.add('ai-disclaimer');
+            disclaimerP.innerHTML = marked.parse(disclaimerText); // Parse disclaimer for markdown like bold
+            reportContentDiv.appendChild(disclaimerP);
+
+            numerologyReportOutput.querySelector('.download-pdf-btn').classList.remove('hidden');
+
+        } catch (error) {
+            console.error('Error generating numerology report:', error);
+            reportContentDiv.innerHTML = '<p class="error-message">Failed to generate report. Please try again. (Error: API communication issue)</p>';
+            numerologyReportOutput.querySelector('.download-pdf-btn').classList.add('hidden');
+        }
+    });
+
+    // --- AI Chat Assistant ---
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const userMessage = chatInput.value.trim();
+        if (!userMessage) return;
+
+        const userMsgDiv = document.createElement('div');
+        userMsgDiv.classList.add('message', 'user-message');
+        userMsgDiv.textContent = userMessage;
+        chatMessages.appendChild(userMsgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        chatInput.value = '';
+
+        const typingIndicator = document.createElement('div');
+        typingIndicator.classList.add('message', 'bot-message');
+        typingIndicator.innerHTML = '<em>AstroMaestro AI is thinking...</em>';
+        chatMessages.appendChild(typingIndicator);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        try {
+            const prompt = `You are AstroMaestro AI, an expert and mystical guide in astrology and numerology. Provide concise, helpful, and insightful answers. If the question is about a personal report, assume they are asking about a report they just generated (though you don't have direct memory of it, phrase it generally). Format your response using **Markdown** (e.g., bold for keywords, bullet points for lists if applicable).
+            User's question: "${userMessage}"`;
+
+            const result = await window.model.generateContent(prompt);
+            const response = await result.response;
+            const botReply = response.text();
+
+            chatMessages.removeChild(typingIndicator);
+
+            const botMsgDiv = document.createElement('div');
+            botMsgDiv.classList.add('message', 'bot-message');
+            botMsgDiv.innerHTML = marked.parse(botReply);
+            chatMessages.appendChild(botMsgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        } catch (error) {
+            console.error('Error in chat assistant:', error);
+            chatMessages.removeChild(typingIndicator);
+            const errorMsgDiv = document.createElement('div');
+            errorMsgDiv.classList.add('message', 'bot-message');
+            errorMsgDiv.innerHTML = '<em>Apologies, I encountered a cosmic disturbance. Please try again.</em>';
+            chatMessages.appendChild(errorMsgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    });
+
+    // --- PDF Download Functionality ---
+    window.downloadPdf = async (reportType) => {
+        let contentDivId, templateDivId, filename;
+        if (reportType === 'astrology') {
+            contentDivId = 'astrology-report-output';
+            templateDivId = 'astrology-pdf-template';
+            filename = 'AstroMaestro_Astrology_Report.pdf';
+        } else if (reportType === 'numerology') {
+            contentDivId = 'numerology-report-output';
+            templateDivId = 'numerology-pdf-template';
+            filename = 'AstroMaestro_Numerology_Report.pdf';
+        } else {
+            return;
+        }
+
+        const reportOutputHTML = document.getElementById(contentDivId).querySelector('.report-content').innerHTML;
+        const pdfTemplate = document.getElementById(templateDivId);
+        pdfTemplate.querySelector('.pdf-content').innerHTML = reportOutputHTML;
+
+        // Temporarily make the template visible off-screen for html2canvas to render
+        pdfTemplate.style.display = 'block';
+        pdfTemplate.style.position = 'absolute';
+        pdfTemplate.style.left = '-9999px';
+
+        try {
+            const canvas = await html2canvas(pdfTemplate, {
+                scale: 3, // Increased scale for better resolution in PDF
+                useCORS: true, // Keep this, useful for other external resources if any
+                logging: false // Disable logging for cleaner console
+            });
+
+            // Re-hide the template
+            pdfTemplate.style.display = 'none';
+            pdfTemplate.style.position = 'static';
+
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4'); // Portrait, millimeters, A4 size
+
+            const imgWidth = 210; // A4 width in mm
+            const pageHeight = 297; // A4 height in mm
+            const imgHeight = (canvas.height * imgWidth) / canvas.width; // Height of the image stretched to A4 width
+
+            let heightLeft = imgHeight;
+            let position = 0; // Tracks the current Y offset for adding image slice
+
+            // First page
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            // Subsequent pages
+            while (heightLeft > 0) {
+                position = position - pageHeight; // Shift the position up by one page height
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            pdf.save(filename);
+
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            alert('Failed to generate PDF. Please try again or check console for details.');
+        } finally {
+             // Ensure template is hidden even on error
+            pdfTemplate.style.display = 'none';
+            pdfTemplate.style.position = 'static';
+        }
+    };
+});
+
+--- END FILE: script.js ---
+
+--- START FILE: style.css ---
+
+/* Basic Reset & Body Styling */
+body {
+    font-family: 'Playfair Display', serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom right, #0a0e1c, #1a0f2e, #2c1240); /* Deep cosmic gradient */
+    color: #f0e6da; /* Off-white for readability */
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 30px 0;
+    text-align: center;
+    border-bottom: 1px solid rgba(138, 43, 226, 0.3); /* Amethyst line */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 3.5em;
+    color: #e6c78e; /* Gold */
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+    margin-bottom: 5px;
+}
+
+header p {
+    font-size: 1.2em;
+    font-style: italic;
+    color: #d1b19a;
+}
+
+/* Navigation */
+nav {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px 0;
+    text-align: center;
+    border-bottom: 1px solid rgba(138, 43, 226, 0.3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+nav button {
+    background: #8a2be2; /* Amethyst */
+    color: #f0e6da;
+    border: none;
+    padding: 12px 25px;
+    margin: 0 10px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 1.1em;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+nav button:hover {
+    background: #9932cc; /* Darker amethyst */
+    transform: translateY(-2px);
+}
+
+nav button:active {
+    transform: translateY(0);
+}
+
+/* Main Content Sections */
+main {
+    flex-grow: 1; /* Allows main content to expand */
+    padding-top: 30px;
+    padding-bottom: 50px;
+}
+
+section {
+    background: rgba(10, 10, 20, 0.7); /* Slightly transparent dark background */
+    border-radius: 15px;
+    padding: 40px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(138, 43, 226, 0.4);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    display: none; /* Hidden by default */
+}
+
+section.active {
+    display: block; /* Show active section */
+}
+
+section h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5em;
+    color: #e6c78e;
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+section p {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+    color: #ccc;
+}
+
+/* Forms */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+form label {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1em;
+    color: #d1b19a;
+    margin-bottom: 5px;
+}
+
+form input[type="text"],
+form input[type="date"],
+form input[type="time"],
+form select {
+    padding: 12px 15px;
+    border: 1px solid #8a2be2;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #f0e6da;
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+form input[type="text"]:focus,
+form input[type="date"]:focus,
+form input[type="time"]:focus,
+form select:focus {
+    border-color: #e6c78e;
+    box-shadow: 0 0 8px rgba(230, 199, 142, 0.5);
+}
+
+/* Placeholder color for inputs */
+form input::placeholder {
+    color: #a090a0;
+}
+
+/* For date and time inputs in some browsers, colors might need specific overrides */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* Makes the icon white */
+}
+
+
+form button[type="submit"] {
+    background: #e6c78e; /* Gold */
+    color: #1a0f2e; /* Deep purple */
+    border: none;
+    padding: 15px 30px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 1.2em;
+    margin-top: 20px;
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+form button[type="submit"]:hover {
+    background: #f0d4a7; /* Lighter gold */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Report Output */
+.report-output {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(230, 199, 142, 0.5); /* Gold border */
+    border-radius: 10px;
+    margin-top: 40px;
+    padding: 30px;
+    box-shadow: inset 0 0 15px rgba(230, 199, 142, 0.2);
+    min-height: 200px;
+    display: none; /* Hidden by default */
+    position: relative;
+}
+
+.report-output.active {
+    display: block;
+}
+
+.report-output h3 {
+    font-family: 'Cinzel', serif;
+    color: #e6c78e;
+    font-size: 2em;
+    text-align: center;
+    margin-bottom: 25px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.report-content {
+    font-size: 1.1em;
+    color: #f0e6da;
+    line-height: 1.8;
+    white-space: pre-wrap; /* Preserves line breaks from AI output */
+    overflow-y: auto;
+    max-height: 400px; /* Limit height for long reports */
+    padding-right: 15px; /* Space for scrollbar */
+}
+
+/* Scrollbar styling */
+.report-content::-webkit-scrollbar {
+    width: 8px;
+}
+.report-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+.report-content::-webkit-scrollbar-thumb {
+    background: #8a2be2;
+    border-radius: 10px;
+}
+.report-content::-webkit-scrollbar-thumb:hover {
+    background: #9932cc;
+}
+
+
+.download-pdf-btn {
+    background: #28a745; /* Green for download */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 1em;
+    margin-top: 25px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    transition: background 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.download-pdf-btn:hover {
+    background: #218838;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Chat Assistant */
+.chat-container {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(138, 43, 226, 0.5);
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 500px; /* Fixed height for chat window */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 15px; /* Space for scrollbar */
+    margin-bottom: 15px;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 8px;
+}
+.chat-messages::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #8a2be2;
+    border-radius: 10px;
+}
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #9932cc;
+}
+
+
+.message {
+    padding: 10px 15px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.user-message {
+    background: #8a2be2; /* Amethyst for user */
+    align-self: flex-end;
+    margin-left: auto;
+    text-align: right;
+}
+
+.bot-message {
+    background: #333; /* Darker grey for bot */
+    align-self: flex-start;
+    margin-right: auto;
+    border: 1px solid #555;
+}
+
+#chat-form {
+    display: flex;
+    gap: 10px;
+}
+
+#chat-input {
+    flex-grow: 1;
+    padding: 12px 15px;
+    border: 1px solid #8a2be2;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #f0e6da;
+    font-size: 1em;
+    outline: none;
+}
+
+#chat-form button {
+    background: #e6c78e;
+    color: #1a0f2e;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 1em;
+    transition: background 0.3s ease;
+}
+
+#chat-form button:hover {
+    background: #f0d4a7;
+}
+
+/* Footer */
+footer {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 20px 0;
+    text-align: center;
+    border-top: 1px solid rgba(138, 43, 226, 0.3);
+    color: #ccc;
+    font-size: 0.9em;
+    margin-top: auto; /* Pushes footer to the bottom */
+}
+
+footer p {
+    margin: 5px 0;
+}
+
+/* PDF Template Styling (Hidden on regular page) */
+.pdf-template {
+    background: #f0e6da; /* Light background for PDF */
+    color: #1a0f2e; /* Dark text for PDF */
+    font-family: 'Playfair Display', serif;
+    padding: 40px;
+    box-sizing: border-box; /* Include padding in element's total width and height */
+    width: 210mm; /* A4 width */
+    min-height: 297mm; /* A4 height */
+}
+
+.pdf-header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #8a2be2;
+    padding-bottom: 20px;
+}
+
+.pdf-logo {
+    width: 80px;
+    height: 80px;
+    display: block;
+    margin: 0 auto 10px;
+}
+
+.pdf-header h2 {
+    font-family: 'Cinzel', serif;
+    color: #8a2be2;
+    font-size: 2.8em;
+    margin: 0;
+}
+
+.pdf-header h3 {
+    font-family: 'Playfair Display', serif;
+    color: #e6c78e;
+    font-size: 1.5em;
+    margin: 5px 0 0;
+    font-style: italic;
+}
+
+.pdf-content {
+    font-size: 1.1em;
+    line-height: 1.7;
+    text-align: justify;
+    padding: 0 20px;
+}
+
+.pdf-content p {
+    margin-bottom: 1em;
+}
+
+.pdf-footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #ccc;
+    font-size: 0.9em;
+    color: #555;
+}
+
+/* Report Content & Chat Message General Text Styling */
+.report-content,
+.chat-messages .message {
+    font-size: 1.1em;
+    color: #f0e6da;
+    line-height: 1.8;
+}
+
+/* Markdown Headings in Reports and Chat */
+.report-content h1,
+.report-content h2,
+.report-content h3,
+.chat-messages .message h1,
+.chat-messages .message h2,
+.chat-messages .message h3 {
+    font-family: 'Cinzel', serif;
+    color: #e6c78e; /* Gold */
+    margin-top: 1.5em;
+    margin-bottom: 0.8em;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    line-height: 1.3;
+}
+
+.report-content h1,
+.chat-messages .message h1 { font-size: 2em; text-align: center; } /* Main report titles within content */
+.report-content h2,
+.chat-messages .message h2 { font-size: 1.8em; }
+.report-content h3,
+.chat-messages .message h3 { font-size: 1.5em; }
+
+/* Paragraphs */
+.report-content p,
+.chat-messages .message p {
+    margin-bottom: 1em;
+}
+
+/* Lists */
+.report-content ul,
+.report-content ol,
+.chat-messages .message ul,
+.chat-messages .message ol {
+    margin-left: 20px;
+    margin-bottom: 1em;
+    padding-left: 10px;
+}
+
+.report-content li,
+.chat-messages .message li {
+    margin-bottom: 0.5em;
+}
+
+/* Strong/Bold text */
+.report-content strong,
+.chat-messages .message strong {
+    color: #e6c78e; /* Make bold text gold for emphasis */
+    font-weight: 700; /* Ensure it's truly bold */
+}
+
+/* Emphasis/Italic text */
+.report-content em,
+.chat-messages .message em {
+    color: #d1b19a; /* A slightly softer gold/bronze for italics */
+    font-style: italic;
+}
+
+/* Blockquotes */
+.report-content blockquote,
+.chat-messages .message blockquote {
+    border-left: 4px solid #8a2be2; /* Amethyst border */
+    padding-left: 15px;
+    margin: 1em 0;
+    font-style: italic;
+    color: #bbb;
+}
+
+/* Code blocks (if used by AI) */
+.report-content pre,
+.chat-messages .message pre {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-family: monospace;
+    font-size: 0.9em;
+    border: 1px solid rgba(138, 43, 226, 0.3);
+}
+
+.report-content code,
+.chat-messages .message code {
+    background: rgba(138, 43, 226, 0.2);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+    color: #f0e6da;
+}
+
+/* Adjustments for PDF template to ensure markdown also looks good */
+.pdf-content h1,
+.pdf-content h2,
+.pdf-content h3 {
+    font-family: 'Cinzel', serif;
+    color: #8a2be2; /* Amethyst for headings in PDF */
+    margin-top: 1.2em;
+    margin-bottom: 0.6em;
+}
+.pdf-content h1 { font-size: 2.2em; text-align: center; }
+.pdf-content h2 { font-size: 1.8em; }
+.pdf-content h3 { font-size: 1.5em; }
+
+.pdf-content p {
+    margin-bottom: 0.8em;
+    color: #333; /* Darker text for readability in PDF */
+}
+
+.pdf-content ul,
+.pdf-content ol {
+    margin-left: 25px;
+    margin-bottom: 0.8em;
+    color: #333;
+}
+
+.pdf-content li {
+    margin-bottom: 0.4em;
+}
+
+.pdf-content strong {
+    font-weight: bold;
+    color: #8a2be2; /* Amethyst for bold in PDF */
+}
+
+.pdf-content em {
+    font-style: italic;
+    color: #555;
+}
+
+.pdf-content blockquote {
+    border-left: 4px solid #8a2be2;
+    padding-left: 15px;
+    margin: 1em 0;
+    font-style: italic;
+    color: #666;
+}
+.pdf-content pre {
+    background: #eee;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-family: monospace;
+    font-size: 0.9em;
+    border: 1px solid #ccc;
+    color: #333;
+}
+.pdf-content code {
+    background: #e0e0e0;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+    color: #333;
+}
+
+
+/* --- Mobile Responsiveness --- */
+
+/* Small tablets and larger phones (up to 768px) */
+@media screen and (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    header h1 {
+        font-size: 2.8em;
+    }
+
+    header p {
+        font-size: 1em;
+    }
+
+    nav button {
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 1em;
+    }
+
+    section {
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+
+    section h2 {
+        font-size: 2em;
+    }
+
+    section p {
+        font-size: 1em;
+    }
+
+    form {
+        gap: 12px;
+    }
+
+    form label {
+        font-size: 1em;
+    }
+
+    form input,
+    form select {
+        padding: 10px 12px;
+        font-size: 0.95em;
+    }
+
+    form button[type="submit"] {
+        padding: 12px 25px;
+        font-size: 1.1em;
+    }
+
+    .report-output {
+        padding: 20px;
+    }
+
+    .report-output h3 {
+        font-size: 1.8em;
+    }
+
+    .report-content {
+        font-size: 1em;
+        line-height: 1.7;
+        max-height: 350px; /* Adjust max-height for smaller screens */
+    }
+
+    .chat-container {
+        height: 450px; /* Adjust chat height */
+        padding: 15px;
+    }
+
+    .message {
+        padding: 8px 12px;
+        font-size: 0.95em;
+    }
+
+    #chat-input {
+        padding: 10px 12px;
+        font-size: 0.95em;
+    }
+
+    #chat-form button {
+        padding: 10px 20px;
+        font-size: 0.95em;
+    }
+}
+
+/* Smaller phones (up to 480px) */
+@media screen and (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+
+    header {
+        padding: 20px 0;
+    }
+
+    header h1 {
+        font-size: 2em;
+    }
+
+    header p {
+        font-size: 0.9em;
+    }
+
+    nav .container {
+        display: flex;
+        flex-direction: column; /* Stack buttons vertically */
+        gap: 10px;
+    }
+
+    nav button {
+        width: calc(100% - 20px); /* Full width minus padding */
+        margin: 0; /* Remove horizontal margin */
+        font-size: 0.9em;
+        padding: 10px;
+    }
+
+    section {
+        padding: 15px;
+    }
+
+    section h2 {
+        font-size: 1.5em;
+    }
+
+    section p {
+        font-size: 0.9em;
+        margin-bottom: 20px;
+    }
+
+    form {
+        gap: 10px;
+    }
+
+    form label {
+        font-size: 0.9em;
+    }
+
+    form input,
+    form select {
+        padding: 8px 10px;
+        font-size: 0.9em;
+    }
+
+    form button[type="submit"] {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+
+    .report-output {
+        padding: 15px;
+    }
+
+    .report-output h3 {
+        font-size: 1.5em;
+    }
+
+    .report-content {
+        font-size: 0.9em;
+        line-height: 1.6;
+        max-height: 300px; /* Further adjust max-height */
+    }
+
+    .download-pdf-btn {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+
+    .chat-container {
+        height: 350px; /* Even smaller chat height */
+        padding: 10px;
+    }
+
+    .message {
+        padding: 7px 10px;
+        font-size: 0.85em;
+        max-width: 90%; /* Allow messages to take more width */
+    }
+
+    #chat-form {
+        flex-direction: column; /* Stack chat input and button */
+        gap: 8px;
+    }
+
+    #chat-input {
+        padding: 8px 10px;
+        font-size: 0.9em;
+        border-radius: 20px;
+    }
+
+    #chat-form button {
+        padding: 8px 15px;
+        font-size: 0.9em;
+        border-radius: 20px;
+    }
+
+    footer {
+        padding: 15px 0;
+        font-size: 0.8em;
+    }
+}
+
+/* New style for the fixed AI disclaimer in reports */
+.ai-disclaimer {
+    font-size: 0.9em;
+    color: #a0a0a0; /* Softer grey */
+    text-align: center;
+    margin-top: 30px; /* Space it out from the report content */
+    padding-top: 20px;
+    border-top: 1px dashed rgba(138, 43, 226, 0.3); /* A subtle divider */
+    font-style: italic;
+    line-height: 1.5;
+}
+
+/* Ensure markdown within the disclaimer also looks good */
+.ai-disclaimer strong {
+    color: #e6c78e; /* Gold for bold within disclaimer */
+    font-weight: bold;
+}
+
+/* Also apply to PDF version of the disclaimer */
+.pdf-content .ai-disclaimer {
+    color: #555; /* Darker grey for PDF readability */
+    border-top: 1px dashed #ccc;
+}
+
+.pdf-content .ai-disclaimer strong {
+    color: #8a2be2; /* Amethyst for bold in PDF disclaimer */
+}
+
+--- END FILE: style.css ---
+
+------------------------------------------------------------------------------
+
+index.mjs:6923 modal.ts injected
+ [bg:index]: Hello World
+ Keep-alive: Wed Aug 20 2025 08:51:42 GMT+0530 (India Standard Time)
+ [update-handler]: Extension updated: 3.0.18 --> 3.0.19
+ Extension update from 3.0.18 --> 3.0.19
+ Keep-alive: Wed Aug 20 2025 08:52:06 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:52:59 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:53:09 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:53:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:53:44 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:54:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:54:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:54:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:55:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:55:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:55:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:56:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:56:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:56:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:57:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:57:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:57:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 08:58:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:58:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:58:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147288942.undefined]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288942.undefined
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:59:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:59:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 08:59:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:00:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:00:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147288993.undefined]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: [remote@1147288993.9]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.9
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.undefined
+index.mjs:2367 [bg:index]: [remote@1147288993.10]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: [remote@1147288993.12]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: [remote@1147288993.13]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: [remote@1147288993.14]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: [remote@1147288993.15]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: [remote@1147288993.17]-[page:captions]:  Array(1)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:00:46 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.10
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.13
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.12
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.15
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.14
+ [bg:index]: [remote@1147288993.18]-[page:captions]:  Array(1)
+ [bg:index]: [remote@1147288993.19]-[page:captions]:  Array(1)
+ [bg:index]: [remote@1147288993.20]-[page:captions]:  Array(1)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.17
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.18
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.19
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288993.20
+ Keep-alive: Wed Aug 20 2025 09:01:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:01:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:01:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:02:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:02:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:02:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:03:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:03:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:03:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:04:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:04:23 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147288998.undefined]-[page:captions]:  Array(1)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147288998.undefined
+ Keep-alive: Wed Aug 20 2025 09:04:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:05:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:05:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:05:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:06:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:06:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:06:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:07:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:07:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:07:44 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:08:03 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289005.undefined]-[page:captions]:  Array(1)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289005.undefined
+ Keep-alive: Wed Aug 20 2025 09:08:28 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:08:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:09:05 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:09:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:09:44 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:10:03 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289009.undefined]-[page:captions]:  Array(1)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289009.undefined
+ Keep-alive: Wed Aug 20 2025 09:10:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:10:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:11:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:11:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:11:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:12:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:12:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:12:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:13:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:13:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:13:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:14:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:14:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:14:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:15:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:15:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:15:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:16:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:16:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:16:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:17:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:17:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:17:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:18:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:18:23 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289014.undefined
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289014.34
+ Keep-alive: Wed Aug 20 2025 09:18:43 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:19:03 GMT+0530 (India Standard Time)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289014.36
+ Keep-alive: Wed Aug 20 2025 09:19:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:19:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:20:03 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:20:23 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:20:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:21:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:21:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:21:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:22:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:22:23 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:22:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:23:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:23:23 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:23:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:24:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:24:23 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:24:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:25:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:25:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:25:43 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289005.undefined]-[page:captions]:  Array(1)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289005.undefined
+ Keep-alive: Wed Aug 20 2025 09:26:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:26:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:26:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:27:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:27:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:27:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:28:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:28:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:28:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:29:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:29:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:29:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:30:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:30:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:30:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:31:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:31:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:31:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:32:03 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:32:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:32:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:33:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:33:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:33:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:34:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:34:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:34:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:35:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:35:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:35:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:36:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:36:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:36:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:37:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:37:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:37:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:38:03 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:38:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:38:43 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:39:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:39:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:39:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:40:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:40:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:40:43 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:41:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:41:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:41:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:42:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:42:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:42:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:43:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:43:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:43:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:44:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:44:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:44:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:45:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:45:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:45:43 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 09:46:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:46:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:46:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:47:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:47:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:47:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:48:03 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:48:24 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:48:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:49:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:49:23 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:49:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:50:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:50:23 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:50:43 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:51:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:51:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:51:43 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:52:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:52:23 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:52:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:53:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:53:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:53:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:54:03 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:54:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:54:43 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:55:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:55:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:55:43 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:56:03 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 09:56:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:56:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:57:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:57:23 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289005.undefined]-[page:captions]:  Array(1)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289005.undefined
+ Keep-alive: Wed Aug 20 2025 09:57:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:58:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:58:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:58:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:59:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:59:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 09:59:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:00:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:00:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:00:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:01:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:01:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:01:43 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289032.undefined]-[page:captions]:  Array(1)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289032.undefined
+ [bg:index]: [remote@1147289032.undefined]-[page:captions]:  Array(1)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289032.undefined
+ Keep-alive: Wed Aug 20 2025 10:02:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:02:23 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289038.undefined]-[page:captions]:  Array(1)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289038.undefined
+ [bg:index]: [remote@1147289038.57]-[page:captions]:  Array(1)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289038.57
+ [bg:index]: [remote@1147289038.59]-[page:captions]:  Array(1)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289038.59
+ Keep-alive: Wed Aug 20 2025 10:02:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:03:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:03:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:03:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:04:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:04:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:04:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:05:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:05:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:05:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:06:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:06:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:06:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:07:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:07:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:07:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:08:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:08:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:08:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:09:03 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289005.undefined]-[page:captions]:  Array(1)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289005.undefined
+ Keep-alive: Wed Aug 20 2025 10:09:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:09:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:10:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:10:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:10:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:11:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:11:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:11:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:12:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:12:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:12:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:13:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:13:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:13:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:14:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:14:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:14:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:15:04 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+ Keep-alive: Wed Aug 20 2025 10:15:23 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289005.undefined]-[page:captions]:  Array(1)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289005.undefined
+ Keep-alive: Wed Aug 20 2025 10:15:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:16:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:16:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:16:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:17:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:17:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:17:43 GMT+0530 (India Standard Time)
+ [bg:index]: [remote@1147289038.71]-[page:captions]:  Array(1)
+ [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289038.71
+ Keep-alive: Wed Aug 20 2025 10:18:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:18:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:18:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:19:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:19:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:19:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:20:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:20:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:20:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:21:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:21:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:21:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:22:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:22:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:22:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:23:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:23:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:23:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:24:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:24:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:24:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:25:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:25:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:25:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:26:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:26:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:26:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:27:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:27:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:27:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:28:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:28:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:28:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:29:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:29:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:29:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:30:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:30:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:30:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:31:03 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:31:23 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:31:43 GMT+0530 (India Standard Time)
+ Keep-alive: Wed Aug 20 2025 10:32:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:32:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:32:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:33:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:33:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:33:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:34:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:34:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:34:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:35:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:35:23 GMT+0530 (India Standard Time)
+early-page.js:6602 [cs:early-page]: Running on page: http://localhost:8080/ top=true
+early-page.js:6602 [cs:early-page]: Assigned globalThis.twoseven
+index.mjs:2367 [bg:index]: [remote@1147289005.undefined]-[page:captions]:  Array(1)
+index.mjs:2367 [bg:index]: Injected 'dist/contentScripts/page.js into page@1147289005.undefined
+index-CUHM8_N7.js:1639 TypeError: Cannot read properties of undefined (reading 'profile')
+    at onUpdate-profile (index-CUHM8_N7.js:72853:26)
+logError @ index-CUHM8_N7.js:1639
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:35:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:36:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:36:23 GMT+0530 (India Standard Time)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2367 [bg:index]: [remote@1147289014.undefined]-[cs:media-finder:mediaElement]:  Array(2)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:36:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:37:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:37:23 GMT+0530 (India Standard Time)
+hook.js:608 Error generating PDF: Error: Incomplete or corrupt PNG file
+    at new i (png.js:209:15)
+    at t.processPNG (png_support.js:311:15)
+    at Object.P (addimage.js:919:40)
+    at t.addImage (addimage.js:855:34)
+    at document.addEventListener.window.downloadPdf (script.js:221:17)
+overrideMethod @ hook.js:608
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:37:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:38:03 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:38:23 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:38:43 GMT+0530 (India Standard Time)
+index.mjs:2377 Keep-alive: Wed Aug 20 2025 10:39:04 GMT+0530 (India Standard Time)
+
+-----------------------------------------------------------------------------------
+
+fix this and make the pdf generation successfull.

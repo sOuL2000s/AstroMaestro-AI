@@ -788,3 +788,31 @@ footer p {
         font-size: 0.8em;
     }
 }
+
+/* New style for the fixed AI disclaimer in reports */
+.ai-disclaimer {
+    font-size: 0.9em;
+    color: #a0a0a0; /* Softer grey */
+    text-align: center;
+    margin-top: 30px; /* Space it out from the report content */
+    padding-top: 20px;
+    border-top: 1px dashed rgba(138, 43, 226, 0.3); /* A subtle divider */
+    font-style: italic;
+    line-height: 1.5;
+}
+
+/* Ensure markdown within the disclaimer also looks good */
+.ai-disclaimer strong {
+    color: #e6c78e; /* Gold for bold within disclaimer */
+    font-weight: bold;
+}
+
+/* Also apply to PDF version of the disclaimer */
+.pdf-content .ai-disclaimer {
+    color: #555; /* Darker grey for PDF readability */
+    border-top: 1px dashed #ccc;
+}
+
+.pdf-content .ai-disclaimer strong {
+    color: #8a2be2; /* Amethyst for bold in PDF disclaimer */
+}
