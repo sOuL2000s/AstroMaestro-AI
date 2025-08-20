@@ -423,8 +423,6 @@ footer p {
     color: #555;
 }
 
-/* ... (existing CSS) ... */
-
 /* Report Content & Chat Message General Text Styling */
 .report-content,
 .chat-messages .message {
@@ -583,4 +581,210 @@ footer p {
     border-radius: 3px;
     font-family: monospace;
     color: #333;
+}
+
+
+/* --- Mobile Responsiveness --- */
+
+/* Small tablets and larger phones (up to 768px) */
+@media screen and (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    header h1 {
+        font-size: 2.8em;
+    }
+
+    header p {
+        font-size: 1em;
+    }
+
+    nav button {
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 1em;
+    }
+
+    section {
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+
+    section h2 {
+        font-size: 2em;
+    }
+
+    section p {
+        font-size: 1em;
+    }
+
+    form {
+        gap: 12px;
+    }
+
+    form label {
+        font-size: 1em;
+    }
+
+    form input,
+    form select {
+        padding: 10px 12px;
+        font-size: 0.95em;
+    }
+
+    form button[type="submit"] {
+        padding: 12px 25px;
+        font-size: 1.1em;
+    }
+
+    .report-output {
+        padding: 20px;
+    }
+
+    .report-output h3 {
+        font-size: 1.8em;
+    }
+
+    .report-content {
+        font-size: 1em;
+        line-height: 1.7;
+        max-height: 350px; /* Adjust max-height for smaller screens */
+    }
+
+    .chat-container {
+        height: 450px; /* Adjust chat height */
+        padding: 15px;
+    }
+
+    .message {
+        padding: 8px 12px;
+        font-size: 0.95em;
+    }
+
+    #chat-input {
+        padding: 10px 12px;
+        font-size: 0.95em;
+    }
+
+    #chat-form button {
+        padding: 10px 20px;
+        font-size: 0.95em;
+    }
+}
+
+/* Smaller phones (up to 480px) */
+@media screen and (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+
+    header {
+        padding: 20px 0;
+    }
+
+    header h1 {
+        font-size: 2em;
+    }
+
+    header p {
+        font-size: 0.9em;
+    }
+
+    nav .container {
+        display: flex;
+        flex-direction: column; /* Stack buttons vertically */
+        gap: 10px;
+    }
+
+    nav button {
+        width: calc(100% - 20px); /* Full width minus padding */
+        margin: 0; /* Remove horizontal margin */
+        font-size: 0.9em;
+        padding: 10px;
+    }
+
+    section {
+        padding: 15px;
+    }
+
+    section h2 {
+        font-size: 1.5em;
+    }
+
+    section p {
+        font-size: 0.9em;
+        margin-bottom: 20px;
+    }
+
+    form {
+        gap: 10px;
+    }
+
+    form label {
+        font-size: 0.9em;
+    }
+
+    form input,
+    form select {
+        padding: 8px 10px;
+        font-size: 0.9em;
+    }
+
+    form button[type="submit"] {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+
+    .report-output {
+        padding: 15px;
+    }
+
+    .report-output h3 {
+        font-size: 1.5em;
+    }
+
+    .report-content {
+        font-size: 0.9em;
+        line-height: 1.6;
+        max-height: 300px; /* Further adjust max-height */
+    }
+
+    .download-pdf-btn {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+
+    .chat-container {
+        height: 350px; /* Even smaller chat height */
+        padding: 10px;
+    }
+
+    .message {
+        padding: 7px 10px;
+        font-size: 0.85em;
+        max-width: 90%; /* Allow messages to take more width */
+    }
+
+    #chat-form {
+        flex-direction: column; /* Stack chat input and button */
+        gap: 8px;
+    }
+
+    #chat-input {
+        padding: 8px 10px;
+        font-size: 0.9em;
+        border-radius: 20px;
+    }
+
+    #chat-form button {
+        padding: 8px 15px;
+        font-size: 0.9em;
+        border-radius: 20px;
+    }
+
+    footer {
+        padding: 15px 0;
+        font-size: 0.8em;
+    }
 }
