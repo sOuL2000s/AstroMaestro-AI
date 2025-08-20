@@ -144,11 +144,23 @@ form select {
     padding: 12px 15px;
     border: 1px solid #8a2be2;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
+    background: #1a0f2e; /* Changed to a dark theme color for select boxes */
     color: #f0e6da;
     font-size: 1em;
     outline: none;
     transition: border-color 0.3s ease;
+}
+
+/* Specific styling for select dropdown to customize appearance */
+form select {
+    -webkit-appearance: none; /* Remove default browser styling */
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f0e6da'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); /* Custom SVG down arrow */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 1em;
+    padding-right: 30px; /* Make space for the custom arrow */
 }
 
 form input[type="text"]:focus,
@@ -230,21 +242,21 @@ form button[type="submit"]:hover {
 /* Scrollbar styling for reports AND chat messages */
 .report-content::-webkit-scrollbar,
 #floating-chat-messages::-webkit-scrollbar {
-    width: 8px;
+    width: 10px; /* Increased width for better visibility */
 }
 .report-content::-webkit-scrollbar-track,
 #floating-chat-messages::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.1); /* Slightly brighter track */
     border-radius: 10px;
 }
 .report-content::-webkit-scrollbar-thumb,
 #floating-chat-messages::-webkit-scrollbar-thumb {
-    background: #8a2be2;
+    background: #9932cc; /* Darker amethyst for better contrast */
     border-radius: 10px;
 }
 .report-content::-webkit-scrollbar-thumb:hover,
 #floating-chat-messages::-webkit-scrollbar-thumb:hover {
-    background: #9932cc;
+    background: #8a2be2; /* Lighter on hover */
 }
 
 
@@ -356,24 +368,26 @@ form button[type="submit"]:hover {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    padding: 15px;
+    /* Removed padding from here, moved to #floating-chat-messages */
 }
 
 #floating-chat-messages {
     flex-grow: 1;
     overflow-y: auto;
-    padding-right: 10px; /* Space for scrollbar */
-    margin-bottom: 15px;
+    padding: 15px; /* Added padding here for scrollable area */
+    margin-bottom: 0; /* Ensures it plays well with flex-grow */
     min-height: 0; /* Ensures proper scrolling within flex container */
 }
 
 /* Chat message styling */
 .message {
     padding: 10px 15px;
-    border-radius: 15px;
-    margin-bottom: 10px;
-    max-width: 85%;
+    /* Adjusted border-radius for a more typical chat bubble look */
+    border-radius: 15px; /* Default for all corners */
+    margin-bottom: 8px; /* Slightly tighter spacing for messages */
+    max-width: 75%; /* Limit width to prevent stretched messages */
     word-wrap: break-word;
+    white-space: pre-wrap; /* Ensures markdown formatting like line breaks are preserved */
     font-size: 0.95em;
     line-height: 1.5;
 }
@@ -382,7 +396,8 @@ form button[type="submit"]:hover {
     background: #8a2be2; /* Amethyst for user */
     align-self: flex-end;
     margin-left: auto;
-    text-align: right;
+    text-align: left; /* Align text to left within user bubble */
+    border-radius: 15px 15px 5px 15px; /* Top-left, Top-right, Bottom-right, Bottom-left (adjusted bottom-right) */
 }
 
 .bot-message {
@@ -390,7 +405,10 @@ form button[type="submit"]:hover {
     align-self: flex-start;
     margin-right: auto;
     border: 1px solid #555;
+    text-align: left; /* Ensure bot message text is left-aligned */
+    border-radius: 15px 15px 15px 5px; /* Top-left, Top-right, Bottom-right, Bottom-left (adjusted bottom-left) */
 }
+
 
 .bot-message.intro-message {
     font-style: italic;
@@ -399,6 +417,17 @@ form button[type="submit"]:hover {
     border: 1px solid rgba(85, 85, 85, 0.7);
     font-size: 0.9em;
 }
+
+.bot-message.proactive-message { /* Distinct style for proactive messages */
+    background: rgba(85, 85, 85, 0.7); /* Keep previous background */
+    border: 1px solid rgba(138, 43, 226, 0.5); /* Amethyst border */
+    font-style: normal;
+    font-size: 0.95em;
+    padding: 12px 18px; /* Slightly more padding for emphasis */
+    border-radius: 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* Add a subtle shadow */
+}
+
 
 .bot-message ul {
     list-style-type: disc;
@@ -410,22 +439,46 @@ form button[type="submit"]:hover {
     margin-bottom: 3px;
 }
 
+/* Enhanced Typing Indicator Dots */
+.typing-indicator {
+    font-style: normal; /* Override default italic for the typing dots container */
+}
+.typing-indicator span {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin: 0 1px;
+    background-color: #f0e6da; /* Matches text color */
+    border-radius: 50%;
+    opacity: 0;
+    animation: typing-fade 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing-fade {
+    0%, 80%, 100% { opacity: 0; }
+    40% { opacity: 1; }
+}
+
 
 #floating-chat-form {
     display: flex;
     gap: 10px;
-    padding-top: 10px;
+    padding: 10px 15px 15px; /* Add padding here for input form area */
     border-top: 1px solid rgba(138, 43, 226, 0.3);
 }
 
 #floating-chat-input {
     flex-grow: 1;
-    padding: 12px 15px;
+    padding: 10px 15px; /* Adjusted padding */
     border: 1px solid #8a2be2;
-    border-radius: 25px;
-    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px; /* Adjusted border-radius */
+    background: #2a1e3d; /* Deeper, less transparent background */
     color: #f0e6da;
-    font-size: 1em;
+    font-size: 0.95em; /* Adjusted font size */
     outline: none;
 }
 
@@ -433,11 +486,11 @@ form button[type="submit"]:hover {
     background: #e6c78e;
     color: #1a0f2e;
     border: none;
-    padding: 12px 25px;
-    border-radius: 25px;
+    padding: 10px 20px; /* Adjusted padding */
+    border-radius: 20px; /* Adjusted border-radius */
     cursor: pointer;
     font-family: 'Cinzel', serif;
-    font-size: 1em;
+    font-size: 0.95em; /* Adjusted font size */
     transition: background 0.3s ease;
 }
 

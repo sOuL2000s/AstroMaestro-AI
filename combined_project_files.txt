@@ -226,18 +226,6 @@ if __name__ == "__main__":
                         <li>Or simply "What's my daily horoscope?"</li>
                     </ul>
                 </div>
-                <!-- ADDED DUMMY MESSAGES FOR SCROLLING TESTING - REMOVE AFTER VERIFICATION -->
-                <div class="message user-message">Test message 1</div>
-                <div class="message bot-message">Bot reply 1. This is a longer message to ensure it takes up more vertical space and helps with the scrolling test.</div>
-                <div class="message user-message">Test message 2</div>
-                <div class="message bot-message">Bot reply 2. Even more content to push the boundaries of the chat window and confirm the scrollbar functionality.</div>
-                <div class="message user-message">Test message 3</div>
-                <div class="message bot-message">Bot reply 3. We are adding many messages to clearly demonstrate that the chat messages container is now correctly scrolling when content exceeds its visible area.</div>
-                <div class="message user-message">Test message 4</div>
-                <div class="message bot-message">Bot reply 4. The scrollbar should be visible on the right side, allowing you to scroll down and see all these test messages.</div>
-                <div class="message user-message">Test message 5</div>
-                <div class="message bot-message">Bot reply 5. Final long message to ensure full test.</div>
-                <!-- END DUMMY MESSAGES -->
             </div>
             <form id="floating-chat-form">
                 <input type="text" id="floating-chat-input" placeholder="Ask your question here..." required>
@@ -905,19 +893,23 @@ form button[type="submit"]:hover {
     padding-right: 15px; /* Space for scrollbar */
 }
 
-/* Scrollbar styling */
-.report-content::-webkit-scrollbar {
+/* Scrollbar styling for reports AND chat messages */
+.report-content::-webkit-scrollbar,
+#floating-chat-messages::-webkit-scrollbar {
     width: 8px;
 }
-.report-content::-webkit-scrollbar-track {
+.report-content::-webkit-scrollbar-track,
+#floating-chat-messages::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
 }
-.report-content::-webkit-scrollbar-thumb {
+.report-content::-webkit-scrollbar-thumb,
+#floating-chat-messages::-webkit-scrollbar-thumb {
     background: #8a2be2;
     border-radius: 10px;
 }
-.report-content::-webkit-scrollbar-thumb:hover {
+.report-content::-webkit-scrollbar-thumb:hover,
+#floating-chat-messages::-webkit-scrollbar-thumb:hover {
     background: #9932cc;
 }
 
@@ -1589,6 +1581,15 @@ footer p {
 
 --- END FILE: style.css ---
 
---------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------
 
-there are issues with the chat with ai feature so fix that. make it perfect.
+
+how can i do the following?
+
+improve the chat with ai feature.
+the chat is not scrollable and is stuck.
+the selection box or drop down background color is white and the text on it is hard to read.
+any other improvements suggested/required on the website?
+make the chat with ai feature rich, intelligent, relevant to the user's reports and efficient.
+
+thank you.

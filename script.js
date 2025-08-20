@@ -1,21 +1,67 @@
+// Global variables for chat state and DOM elements (declared here for global access)
+let currentChatSession = null;
+let conversationHistory = []; // This will store the messages for the UI, synced with Gemini API history
+let lastGeneratedReportType = null; // 'astrology', 'numerology', or null
+
+// DOM elements - declared here, assigned inside DOMContentLoaded
+let astrologyForm, numerologyForm, dailyHoroscopeForm, tarotForm;
+let astrologyReportOutput, numerologyReportOutput, dailyHoroscopeOutput, tarotOutput;
+let chatBubble, floatingChatModal, closeChatModalBtn, floatingChatMessages, floatingChatInput, floatingChatForm;
+
+
+// Function to render messages to the UI from the conversationHistory array
+function renderChatMessages() {
+    // Ensure floatingChatMessages is available before trying to use it
+    if (!floatingChatMessages) {
+        console.error("floatingChatMessages element not found or not initialized.");
+        return;
+    }
+
+    floatingChatMessages.innerHTML = ''; // Clear existing messages
+    conversationHistory.forEach(msg => {
+        // Ensure msg.parts[0].text exists and handle markdown parsing for bot messages
+        const messageText = msg.parts && msg.parts.length > 0 && msg.parts[0].text ? msg.parts[0].text : '';
+        const msgDiv = document.createElement('div');
+        // Determine if it's a user or bot message
+        msgDiv.classList.add('message', msg.role === 'user' ? 'user-message' : 'bot-message');
+        msgDiv.innerHTML = marked.parse(messageText); // Parse markdown here
+        floatingChatMessages.appendChild(msgDiv);
+    });
+    // Scroll to the bottom of the chat
+    floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
+}
+
+// Function to initialize/get chat session (Gemini API context)
+async function getChatSession() {
+    if (!currentChatSession) {
+        // IMPORTANT FIX: Initialize chat session with an EMPTY history.
+        // The Gemini API requires the first turn in 'history' to be from 'user'.
+        // We will manage the initial bot greeting separately on the UI.
+        currentChatSession = window.model.startChat({ history: [] });
+        conversationHistory = []; // Ensure local history is also empty
+    }
+    return currentChatSession;
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
-    const astrologyForm = document.getElementById('astrology-form');
-    const numerologyForm = document.getElementById('numerology-form');
-    const dailyHoroscopeForm = document.getElementById('daily-horoscope-form');
-    const tarotForm = document.getElementById('tarot-form');
+    // Assign DOM elements once the document is ready
+    astrologyForm = document.getElementById('astrology-form');
+    numerologyForm = document.getElementById('numerology-form');
+    dailyHoroscopeForm = document.getElementById('daily-horoscope-form');
+    tarotForm = document.getElementById('tarot-form');
 
-    const astrologyReportOutput = document.getElementById('astrology-report-output');
-    const numerologyReportOutput = document.getElementById('numerology-report-output');
-    const dailyHoroscopeOutput = document.getElementById('daily-horoscope-output');
-    const tarotOutput = document.getElementById('tarot-output');
+    astrologyReportOutput = document.getElementById('astrology-report-output');
+    numerologyReportOutput = document.getElementById('numerology-report-output');
+    dailyHoroscopeOutput = document.getElementById('daily-horoscope-output');
+    tarotOutput = document.getElementById('tarot-output');
 
-    // Floating Chat Elements
-    const chatBubble = document.getElementById('chat-bubble');
-    const floatingChatModal = document.getElementById('floating-chat-modal');
-    const closeChatModalBtn = document.getElementById('close-chat-modal-btn');
-    const floatingChatMessages = document.getElementById('floating-chat-messages');
-    const floatingChatInput = document.getElementById('floating-chat-input');
-    const floatingChatForm = document.getElementById('floating-chat-form');
+    chatBubble = document.getElementById('chat-bubble');
+    floatingChatModal = document.getElementById('floating-chat-modal');
+    closeChatModalBtn = document.getElementById('close-chat-modal-btn');
+    floatingChatMessages = document.getElementById('floating-chat-messages');
+    floatingChatInput = document.getElementById('floating-chat-input');
+    floatingChatForm = document.getElementById('floating-chat-form');
 
 
     // Function to switch sections and highlight nav button
@@ -118,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
             astrologyReportOutput.querySelector('.download-pdf-btn').classList.remove('hidden');
+            lastGeneratedReportType = 'astrology'; // Set the last report type here
 
         } catch (error) {
             console.error('Error generating astrology report:', error);
@@ -159,6 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reportContentDiv.appendChild(disclaimerP);
 
             numerologyReportOutput.querySelector('.download-pdf-btn').classList.remove('hidden');
+            lastGeneratedReportType = 'numerology'; // Set the last report type here
 
         } catch (error) {
             console.error('Error generating numerology report:', error);
@@ -246,11 +294,49 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Floating AI Chat Assistant ---
-    chatBubble.addEventListener('click', () => {
+    chatBubble.addEventListener('click', async () => {
         floatingChatModal.classList.toggle('hidden');
         if (!floatingChatModal.classList.contains('hidden')) {
-            floatingChatInput.focus(); // Focus input when chat opens
-            floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight; // Scroll to bottom
+            floatingChatInput.focus();
+
+            await getChatSession(); // Initialize session if not already
+
+            // Add initial bot greeting if starting a fresh chat within the UI
+            // This is purely UI, not sent to Gemini history.
+            // Check if UI is also empty (no child messages, including any initial ones from previous session opens)
+            if (conversationHistory.length === 0 && floatingChatMessages.children.length === 0) { 
+                const initialBotGreeting = `Hello! I am AstroMaestro AI, your cosmic guide. How may I assist you today regarding mystical knowledge?
+                You can ask me about:
+                - Your generated reports
+                - Astrological concepts (e.g., "What is a retrograde?")
+                - Numerological meanings
+                - Or simply "What's my daily horoscope?"`;
+                
+                const initialBotMsgDiv = document.createElement('div');
+                initialBotMsgDiv.classList.add('message', 'bot-message', 'intro-message');
+                initialBotMsgDiv.innerHTML = marked.parse(initialBotGreeting);
+                floatingChatMessages.appendChild(initialBotMsgDiv);
+            }
+            
+            // Render any actual conversation history (from API interaction)
+            renderChatMessages(); 
+
+            // Add a proactive message based on last generated report, only if applicable and not already displayed
+            const proactiveMessageText = `I see you recently generated a **${lastGeneratedReportType ? lastGeneratedReportType.charAt(0).toUpperCase() + lastGeneratedReportType.slice(1) : ''}** report. Do you have any questions about it?`;
+            
+            // Check if *any* proactive message exists in the UI already
+            const isProactiveMessageDisplayed = Array.from(floatingChatMessages.children).some(
+                (el) => el.classList.contains('proactive-message')
+            );
+
+            // Only add the proactive message if a report type is set AND it hasn't been added yet
+            if (lastGeneratedReportType && !isProactiveMessageDisplayed) {
+                const proactiveMsgDiv = document.createElement('div');
+                proactiveMsgDiv.classList.add('message', 'bot-message', 'intro-message', 'proactive-message');
+                proactiveMsgDiv.innerHTML = marked.parse(proactiveMessageText);
+                floatingChatMessages.appendChild(proactiveMsgDiv);
+            }
+            floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
         }
     });
 
@@ -263,40 +349,47 @@ document.addEventListener('DOMContentLoaded', () => {
         const userMessage = floatingChatInput.value.trim();
         if (!userMessage) return;
 
+        // Add user message to UI
         const userMsgDiv = document.createElement('div');
         userMsgDiv.classList.add('message', 'user-message');
-        userMsgDiv.textContent = userMessage;
+        userMsgDiv.textContent = userMessage; // Use textContent for user input to prevent XSS
         floatingChatMessages.appendChild(userMsgDiv);
         floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
 
         floatingChatInput.value = '';
 
+        // Add enhanced typing indicator
         const typingIndicator = document.createElement('div');
-        typingIndicator.classList.add('message', 'bot-message');
-        typingIndicator.innerHTML = '<em>AstroMaestro AI is thinking...</em>';
+        typingIndicator.classList.add('message', 'bot-message', 'typing-indicator');
+        typingIndicator.innerHTML = 'AstroMaestro AI is thinking<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
         floatingChatMessages.appendChild(typingIndicator);
         floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
 
         try {
-            // Updated prompt to make AI more versatile and suggest daily horoscope
-            const prompt = `You are AstroMaestro AI, an expert and mystical guide in astrology, numerology, and general mystical knowledge. You can also provide concise daily general horoscopes if asked. Provide concise, helpful, and insightful answers. If the question is about a personal report, phrase it generally as you do not retain memory of specific user reports. Format your response using **Markdown** (e.g., bold for keywords, bullet points for lists if applicable).
-            User's question: "${userMessage}"`;
+            const chatSession = await getChatSession();
 
-            const result = await window.model.generateContent(prompt);
+            const result = await chatSession.sendMessage(userMessage);
             const response = await result.response;
             const botReply = response.text();
 
-            floatingChatMessages.removeChild(typingIndicator);
+            // REMOVE TYPING INDICATOR *BEFORE* UPDATING AND RENDERING
+            // Ensure the typing indicator is still in the DOM before attempting to remove it
+            if (floatingChatMessages.contains(typingIndicator)) {
+                floatingChatMessages.removeChild(typingIndicator);
+            }
 
-            const botMsgDiv = document.createElement('div');
-            botMsgDiv.classList.add('message', 'bot-message');
-            botMsgDiv.innerHTML = marked.parse(botReply);
-            floatingChatMessages.appendChild(botMsgDiv);
-            floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
+            // Update the local conversationHistory with the *full* history from the chat session
+            conversationHistory = await chatSession.getHistory();
+
+            // Re-render all messages (including the new bot reply)
+            renderChatMessages();
 
         } catch (error) {
             console.error('Error in chat assistant:', error);
-            floatingChatMessages.removeChild(typingIndicator);
+            // Ensure typing indicator is removed even on error
+            if (floatingChatMessages.contains(typingIndicator)) {
+                floatingChatMessages.removeChild(typingIndicator);
+            }
             const errorMsgDiv = document.createElement('div');
             errorMsgDiv.classList.add('message', 'bot-message');
             errorMsgDiv.innerHTML = '<em>Apologies, I encountered a cosmic disturbance. Please try again.</em>';
