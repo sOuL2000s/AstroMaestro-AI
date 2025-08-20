@@ -390,6 +390,8 @@ form button[type="submit"]:hover {
     white-space: pre-wrap; /* Ensures markdown formatting like line breaks are preserved */
     font-size: 0.95em;
     line-height: 1.5;
+    /* --- NEW/UPDATED: Added subtle shadow for depth --- */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .user-message {
@@ -398,6 +400,8 @@ form button[type="submit"]:hover {
     margin-left: auto;
     text-align: left; /* Align text to left within user bubble */
     border-radius: 15px 15px 5px 15px; /* Top-left, Top-right, Bottom-right, Bottom-left (adjusted bottom-right) */
+    /* --- NEW/UPDATED: More prominent shadow for user message --- */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), inset 0 0 5px rgba(255, 255, 255, 0.1);
 }
 
 .bot-message {
@@ -407,6 +411,8 @@ form button[type="submit"]:hover {
     border: 1px solid #555;
     text-align: left; /* Ensure bot message text is left-aligned */
     border-radius: 15px 15px 15px 5px; /* Top-left, Top-right, Bottom-right, Bottom-left (adjusted bottom-left) */
+    /* --- NEW/UPDATED: Similar shadow for bot message --- */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), inset 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 
@@ -602,6 +608,18 @@ footer p {
 .chat-messages .message h2 { font-size: 1.8em; }
 .report-content h3,
 .chat-messages .message h3 { font-size: 1.5em; }
+
+/* --- NEW/UPDATED: Adjusted markdown heading sizes specifically for chat messages --- */
+.chat-messages .message h1,
+.chat-messages .message h2,
+.chat-messages .message h3 {
+    margin-top: 1em; /* Slightly less margin than report headings */
+    margin-bottom: 0.5em; /* Reduced bottom margin */
+    text-align: left; /* Ensure alignment within message bubble */
+}
+.chat-messages .message h1 { font-size: 1.6em; } /* Smaller for chat, still prominent */
+.chat-messages .message h2 { font-size: 1.4em; } /* Smaller for chat */
+.chat-messages .message h3 { font-size: 1.2em; } /* Smaller for chat */
 
 /* Paragraphs */
 .report-content p,
@@ -802,7 +820,7 @@ footer p {
         max-height: 350px; /* Adjust max-height for smaller screens */
     }
 
-    .floating-chat-modal {
+    #floating-chat-modal {
         width: 90%;
         right: 5%;
         left: 5%;
@@ -904,7 +922,7 @@ footer p {
         font-size: 0.9em;
     }
 
-    .floating-chat-modal {
+    #floating-chat-modal {
         height: 350px; /* Even smaller chat height */
         bottom: 80px;
     }
@@ -960,8 +978,4 @@ footer p {
 .pdf-content .ai-disclaimer {
     color: #555; /* Darker grey for PDF readability */
     border-top: 1px dashed #ccc;
-}
-
-.pdf-content .ai-disclaimer strong {
-    color: #8a2be2; /* Amethyst for bold in PDF disclaimer */
 }
