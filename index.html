@@ -17,9 +17,10 @@
 
     <nav>
         <div class="container">
-            <button onclick="showSection('astrology-section')">Astrology Report</button>
-            <button onclick="showSection('numerology-section')">Numerology Report</button>
-            <button onclick="showSection('chat-section')">AI Chat Assistant</button>
+            <button id="nav-astrology" onclick="showSection('astrology-section', this)" class="nav-button active">Astrology Report</button>
+            <button id="nav-numerology" onclick="showSection('numerology-section', this)" class="nav-button">Numerology Report</button>
+            <button id="nav-daily-horoscope" onclick="showSection('daily-horoscope-section', this)" class="nav-button">Daily Horoscope</button>
+            <button id="nav-tarot" onclick="showSection('tarot-section', this)" class="nav-button">Tarot Reading</button>
         </div>
     </nav>
 
@@ -106,29 +107,76 @@
             </div>
         </section>
 
-        <section id="chat-section">
-            <h2>AstroMaestro AI Chat Assistant</h2>
-            <p>Ask further questions about your reports, astrological concepts, or numerological interpretations.</p>
-            <div class="chat-container">
-                <div id="chat-messages" class="chat-messages">
-                    <div class="message bot-message">Hello! I am AstroMaestro AI. How may I assist you today regarding your reports or mystical knowledge?</div>
-                </div>
-                <form id="chat-form">
-                    <input type="text" id="chat-input" placeholder="Ask your question here..." required>
-                    <button type="submit">Send</button>
-                </form>
+        <section id="daily-horoscope-section">
+            <h2>Your Daily Cosmic Forecast</h2>
+            <p>Receive an insightful horoscope for today, guiding your path through the celestial influences.</p>
+            <form id="daily-horoscope-form">
+                <label for="horo-dob">Your Date of Birth (to determine Zodiac Sign):</label>
+                <input type="date" id="horo-dob" required>
+                <button type="submit">Get Daily Horoscope</button>
+            </form>
+            <div id="daily-horoscope-output" class="report-output">
+                <h3>Your Daily Insight</h3>
+                <div class="report-content"></div>
             </div>
         </section>
+
+        <section id="tarot-section">
+            <h2>Unveil Tarot's Wisdom</h2>
+            <p>Pose a question or focus on an area of your life, and let the cards illuminate your path.</p>
+            <form id="tarot-form">
+                <label for="tarot-question">Your Question or Area of Focus:</label>
+                <input type="text" id="tarot-question" placeholder="e.g., What should I focus on for personal growth?" required>
+                <button type="submit">Draw 3 Cards</button>
+            </form>
+            <div id="tarot-output" class="report-output">
+                <h3>Tarot's Message</h3>
+                <div class="report-content"></div>
+            </div>
+        </section>
+
     </main>
+
+    <!-- Floating Chat Assistant -->
+    <div id="chat-bubble">
+        <!-- Ensure chat-icon.png exists in the same directory as index.html -->
+        <img src="chat-icon.png" alt="Chat with AI" class="chat-icon">
+    </div>
+
+    <div id="floating-chat-modal" class="hidden">
+        <div class="chat-header">
+            <h3>AstroMaestro AI Chat</h3>
+            <button id="close-chat-modal-btn">&times;</button>
+        </div>
+        <div class="chat-container">
+            <div id="floating-chat-messages" class="chat-messages">
+                <div class="message bot-message">Hello! I am AstroMaestro AI. How may I assist you today regarding your reports or mystical knowledge?</div>
+                <div class="message bot-message intro-message">You can ask me about:
+                    <ul>
+                        <li>Your generated reports</li>
+                        <li>Astrological concepts (e.g., "What is a retrograde?")</li>
+                        <li>Numerological meanings</li>
+                        <li>Or simply "What's my daily horoscope?"</li>
+                    </ul>
+                </div>
+            </div>
+            <form id="floating-chat-form">
+                <input type="text" id="floating-chat-input" placeholder="Ask your question here..." required>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+
 
     <!-- Include Google's Generative AI JS SDK -->
     <script type="module">
+        // Corrected import path for Google Generative AI Web SDK
         import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
         // IMPORTANT: In a real application, NEVER expose your API key like this.
         // Use a server-side proxy to keep your key secure.
         const API_KEY = "AIzaSyCzx6ReMk8ohPJcCjGwHHzu7SvFccJqAbA"; // Your provided Gemini API Key
-        const MODEL_NAME = "gemini-2.5-flash-preview-05-20";
+        const MODEL_NAME = "gemini-2.5-flash-preview-05-20"; // Updated to a newer, generally available model
 
         const genAI = new GoogleGenerativeAI(API_KEY);
         const model = genAI.getGenerativeModel({ model: MODEL_NAME });
