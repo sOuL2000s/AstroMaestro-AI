@@ -1,7 +1,7 @@
 // Global variables for chat state and DOM elements (declared here for global access)
 let currentChatSession = null;
 let conversationHistory = []; // This will store the messages for the UI, synced with Gemini API history
-let lastGeneratedReportType = null; // 'astrology', 'numerology', or null
+let lastGeneratedReportInfo = null; // Stores an object with report type and content
 
 // DOM elements - declared here, assigned inside DOMContentLoaded
 let astrologyForm, numerologyForm, dailyHoroscopeForm, tarotForm;
@@ -39,9 +39,8 @@ function renderChatMessages() {
 // Function to initialize/get chat session (Gemini API context)
 async function getChatSession() {
     if (!currentChatSession) {
-        // IMPORTANT FIX: Initialize chat session with an EMPTY history.
-        // The Gemini API requires the first turn in 'history' to be from 'user'.
-        // We will manage the initial bot greeting separately on the UI.
+        // Initialize chat session with an EMPTY history.
+        // We will manage the initial bot greeting and context separately.
         currentChatSession = window.model.startChat({ history: [] });
         conversationHistory = []; // Ensure local history is also empty
     }
@@ -128,31 +127,92 @@ document.addEventListener('DOMContentLoaded', () => {
         astrologyReportOutput.querySelector('.download-pdf-btn').classList.add('hidden'); // Hide download button during generation
 
         try {
-            let astrologyPrompt = `Generate a comprehensive ${astroSystem} astrological birth chart report for ${name}, born on ${dob} at ${tob} in ${place}.`;
+            let astrologyPrompt;
 
             if (astroSystem === 'Vedic') {
-                astrologyPrompt += `
-                This report should adhere to Vedic (Indian) astrological principles. Include detailed interpretations for:
-                - **Planetary Placements (Grahas):** Sun (Surya), Moon (Chandra), Mars (Mangal), Mercury (Budha), Jupiter (Guru), Venus (Shukra), Saturn (Shani), Rahu, and Ketu. For each planet, describe its sign (Rashi) and house (Bhava) placement and its general influence on personality and life areas.
-                - **Ascendant (Lagna):** Interpret the rising sign and its profound impact on temperament and physical appearance.
-                - **Nakshatras:** For the Moon and Sun, identify their Nakshatra and provide a brief interpretation of its significance.
-                - **House (Bhava) Interpretations:** Briefly describe the general significance of each of the 12 houses (Dharmasthanas, Arthasthanas, Kamasthanas, Mokshasthanas) and how the planets placed within them might influence those life areas.
-                - **Yogas (Planetary Combinations):** Identify and briefly interpret any prominent beneficial or challenging Yogas formed by planetary combinations (e.g., Dhana Yoga, Raja Yoga, Kemadruma Yoga, Shakata Yoga), if applicable.
-                - **General Life Path & Destiny:** Provide an overarching summary of their life purpose, challenges, strengths, and areas of growth based on the complete chart.
-                `;
+                astrologyPrompt = `Generate a highly detailed and comprehensive Vedic (Indian) astrology birth chart report for a person named "${name}", born on ${dob} at ${tob} in ${place}. All astrological interpretations should strictly adhere to Vedic principles, including the use of **Lahiri Ayanamsa**.
+
+                **Crucial Instruction for AI:** As an AI, you are not performing real-time astronomical calculations. Instead, you are tasked with generating a detailed *interpretive report*. Please proceed by inferring or stating the most probable **Sidereal Sun Sign, Sidereal Moon Sign (Rashi), and Ascendant (Lagna) Sign & Degree** based on typical Lahiri Ayanamsa conventions and general astrological correlations for the provided birth details. Then, provide the comprehensive interpretations for each section as if these initial chart facts were accurately calculated.
+
+                Include the following sections with rich, insightful detail, using Markdown for clear formatting:
+
+                ## 🕉️ Basic Astrological Details
+                - **Personal Information:** Name, Date of Birth, Time of Birth, Place of Birth.
+                - **Core Vedic Data (Inferred/Stated for Interpretation):**
+                    - **Sidereal Sun Sign:** (Infer the Sun's sidereal sign and degree, e.g., "Sun in Scorpio at 5°")
+                    - **Sidereal Moon Sign (Rashi):** (Infer the Moon's sidereal sign and degree, e.g., "Moon in Virgo at 8°")
+                    - **Ascendant (Lagna) Sign:** (Infer the Lagna sign and degree, e.g., "Scorpio Ascendant at 12°")
+                    - **Nakshatra & Pada:** For the inferred Moon sign, state its Nakshatra and Pada (e.g., "Moon in Uttaraphalguni Nakshatra, Pada 3").
+                    - **Tithi, Karana, Yoga, Day of Birth, Ayanamsa used (Lahiri).**
+                    - **Avkahada Chakra Points:** Include brief interpretations for Paya, Varna, Yoni, Gana, Vasya, Nadi, as often found in comprehensive Vedic reports.
+                    - **Favourable/Ghatak Points:** List and briefly interpret lucky numbers, good/evil numbers, lucky days, good planets, friendly signs, lucky metal, lucky stone, and malefics (bad day, bad karan, bad lagna, bad month, bad nakshatra, bad rasi, bad tithi, bad yoga, bad planets).
+
+                ## 🏡 Lagna Kundali (Birth Chart - Textual Overview)
+                - Describe the Lagna (Ascendant) house (e.g., "Scorpio Ascendant").
+                - Provide a textual representation of the Lagna chart. For each house, list the sign it represents and any planets placed within it. This is a textual description, **not a graphical chart**.
+                - **Example Format for Lagna Kundali textual representation:**
+                    - **House 1 (Ascendant):** [Inferred Lagna Sign] (e.g., Scorpio). Planets: [Planet A] ([Degree]), [Planet B] ([Degree])
+                    - **House 2:** [Sign] (e.g., Sagittarius). Planets: [Planet C] ([Degree])
+                    - ... continue for all 12 houses.
+
+                ## 🌌 Planetary Interpretations (Navagrahas)
+                For each of the **Navagrahas (Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Rahu, Ketu)**, based on their inferred placements:
+                - State its sign and house placement in the Lagna chart.
+                - Provide a **detailed interpretation** of its influence on personality, life events, strengths, challenges, and specific life areas.
+                - Mention any significant aspects (drishti) it makes to other planets or houses, and their likely effects.
+
+                ## ✨ Major Yogas (Planetary Combinations)
+                - Identify and explain any prominent beneficial or challenging Yogas (e.g., Raja Yoga, Dhana Yoga, Kemadruma Yoga, Neecha Bhanga Raja Yoga, Gaja Kesari Yoga, etc.) inferred to be present in the chart.
+                - Describe their implications for the native's destiny and life path.
+                - If no major yogas are identified, state that.
+
+                ## ⏱️ Vimshottari Dasha Predictions
+                - State the **current ongoing Mahadasha** (major planetary period) based on the inferred Moon's Nakshatra.
+                - Provide a **comprehensive overview** of the likely effects and major themes of this Mahadasha period.
+                - List the **current Antardasha** (sub-period) and provide its general predictions, including potential challenges and opportunities within this shorter timeframe.
+                - Suggest relevant remedies to optimize the dasha's influence if needed.
+
+                ## 🪐 Sade Sati (Saturn's 7.5 Year Transit) Analysis
+                - Based on the **inferred Moon Sign (Rashi)**, determine if Sade Sati is currently active or upcoming, and specify which phase (Rising, Peak, Setting) it is in.
+                - Describe the **general and specific effects** and challenges associated with Sade Sati for this Moon Sign, covering areas like health, finance, relationships, and mental well-being.
+                - Provide **specific, actionable Vedic remedies** and practices to mitigate negative effects of Sade Sati, if applicable.
+
+                ## ⚔️ Mangal Dosha (Kuja Dosha) Analysis
+                - Determine if Mangal Dosha is inferred to be present in the Lagna chart based on Mars's placement (1st, 2nd, 4th, 7th, 8th, or 12th house from Lagna, Moon, or Venus).
+                - Explain its implications, particularly for marriage and partnerships.
+                - Provide **specific, actionable Vedic remedies** for Mangal Dosha, if present.
+
+                ## 🐍 Kalsarpa Dosha Analysis
+                - Determine if Kalsarpa Dosha is inferred to be present (i.e., all planets inferred to be positioned between Rahu and Ketu on one side of the nodal axis).
+                - Explain its general impact on life, including potential struggles and challenges.
+                - Provide **specific, actionable Vedic remedies** for Kalsarpa Dosha, if present.
+
+                ## 🏮 Lal Kitab Predictions and Remedies
+                For each of the following planets (Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Rahu, Ketu) that are inferred to be prominently placed or have a significant impact in the chart, provide:
+                - A concise **Lal Kitab prediction** for that planet's inferred influence in the native's chart (general house effect, benefic/malefic potential).
+                - At least **one specific, actionable Lal Kitab remedy** associated with that planet's placement or general challenges it might present, drawing from traditional Lal Kitab practices.
+
+                ## 🔮 General Life Path & Destiny Insights
+                - **Character & Personality:** A comprehensive overview of the native's core personality traits, strengths, weaknesses, and temperament based on the holistic chart analysis.
+                - **Health:** General health predispositions, potential ailments, and advice for well-being.
+                - **Family & Relationships:** Insights into familial bonds, dynamics with parents and siblings, marriage prospects, and the nature of partnerships.
+                - **Career & Occupation:** Favorable career paths, professional inclinations, potential for success, and areas for growth.
+                - **Finance:** Financial prospects, earning potential, wealth accumulation, and advice on managing resources.
+                - **Education:** Learning style, educational journey, potential for academic success, and favorable fields of study.
+
+                Maintain a deeply spiritual, mystical, and authoritative tone, as if a seasoned and compassionate Vedic astrologer is providing insights. Format the output using **Markdown** with clear, bold headings (## for main sections, ### for sub-sections), bullet points for lists, and **bold text** for emphasis. Ensure the content is easy to read, structured for a comprehensive report, and inspiring.`;
             } else { // Western Astrology
-                astrologyPrompt += `
+                astrologyPrompt = `
+                Generate a comprehensive Western astrological birth chart report for ${name}, born on ${dob} at ${tob} in ${place}.
                 This report should adhere to Western astrological principles. Include detailed interpretations for:
+                - **Personal Information:** Name, Date of Birth, Time of Birth, Place of Birth.
                 - **Planetary Placements:** Sun, Moon, Ascendant, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, and Pluto. For each, describe its sign and house placement and its general influence on personality and life areas.
                 - **Major Aspects:** Briefly interpret key aspects between planets (e.g., conjunctions, oppositions, squares, trines, sextiles), highlighting their dynamic impact.
                 - **House Interpretations:** Describe the general significance of each of the 12 houses and how the planets placed within them might influence those life areas.
                 - **Elemental & Modal Balance:** Briefly discuss the balance of elements (Fire, Earth, Air, Water) and modalities (Cardinal, Fixed, Mutable) in the chart and what it suggests about their temperament.
                 - **General Life Path & Destiny:** Provide an overarching summary of their life purpose, challenges, strengths, and areas of growth based on the complete chart.
-                `;
+                Maintain an inspiring, insightful, and mystical tone. Format the output using **Markdown** with clear, bold headings for each section (e.g., "## The Cosmic Core: Sun, Moon & Ascendant", "### Planetary Interpretations"), use bullet points for lists, and bold text for emphasis.`;
             }
-
-            astrologyPrompt += `
-            Maintain an inspiring, insightful, and mystical tone. Format the output using **Markdown** with clear, bold headings for each section (e.g., "## The Cosmic Core: Sun, Moon & Ascendant", "### Planetary Interpretations"), use bullet points for lists, and bold text for emphasis.`;
             
             const result = await window.model.generateContent(astrologyPrompt);
             const response = await result.response;
@@ -161,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reportContentDiv.innerHTML = marked.parse(text);
 
             // Append the fixed disclaimer AFTER the AI-generated content
-            const disclaimerText = `**Important Note:** This report is generated by an AI based on vast astrological knowledge and patterns. It provides interpretive insights and symbolic guidance. For precise astrological calculations (e.g., exact degrees, specific Dasha periods, precise house cusps) or a visual chart representation (like a Lagna Kundali or Western wheel), consulting a professional astrologer with specialized software is recommended, as this AI does not perform live astronomical calculations or generate visual charts.`;
+            const disclaimerText = `**Important Note:** This report is generated by an AI based on vast astrological knowledge and patterns. It provides interpretive insights and symbolic guidance. Please note: This AI provides interpretations based on astrological principles and data. It does not perform real-time astronomical calculations or generate visual birth charts (Lagna Kundalis/Western Wheels). For precise calculations and visual charts, it is recommended to consult a professional astrologer or specialized software.`;
             const disclaimerP = document.createElement('p');
             disclaimerP.classList.add('ai-disclaimer');
             disclaimerP.innerHTML = marked.parse(disclaimerText); // Parse disclaimer for markdown like bold
@@ -169,12 +229,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
             astrologyReportOutput.querySelector('.download-pdf-btn').classList.remove('hidden');
-            lastGeneratedReportType = 'astrology'; // Set the last report type here
+            
+            // Store the generated report content for chat context
+            lastGeneratedReportInfo = {
+                type: 'astrology',
+                name: name,
+                dob: dob,
+                tob: tob,
+                place: place,
+                system: astroSystem,
+                reportContent: text // Store the full markdown content
+            };
 
         } catch (error) {
             console.error('Error generating astrology report:', error);
             reportContentDiv.innerHTML = '<p class="error-message">Failed to generate report. Please try again. (Error: API communication issue)</p>';
             astrologyReportOutput.querySelector('.download-pdf-btn').classList.add('hidden');
+            lastGeneratedReportInfo = null; // Clear context on error
         }
     });
 
@@ -211,12 +282,20 @@ document.addEventListener('DOMContentLoaded', () => {
             reportContentDiv.appendChild(disclaimerP);
 
             numerologyReportOutput.querySelector('.download-pdf-btn').classList.remove('hidden');
-            lastGeneratedReportType = 'numerology'; // Set the last report type here
+            
+            // Store the generated report content for chat context
+            lastGeneratedReportInfo = {
+                type: 'numerology',
+                name: name,
+                dob: dob,
+                reportContent: text
+            };
 
         } catch (error) {
             console.error('Error generating numerology report:', error);
             reportContentDiv.innerHTML = '<p class="error-message">Failed to generate report. Please try again. (Error: API communication issue)</p>';
             numerologyReportOutput.querySelector('.download-pdf-btn').classList.add('hidden');
+            lastGeneratedReportInfo = null; // Clear context on error
         }
     });
 
@@ -304,9 +383,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!floatingChatModal.classList.contains('hidden')) {
             floatingChatInput.focus();
 
-            await getChatSession(); // Initialize session if not already
+            // Get chat session or initialize a new one if needed
+            const chatSession = await getChatSession();
 
-            // Add initial bot greeting if starting a fresh chat within the UI
+            // Only add initial bot greeting if starting a fresh chat within the UI
             // This is purely UI, not sent to Gemini history.
             // Check if UI is also empty (no child messages, including any initial ones from previous session opens)
             if (conversationHistory.length === 0 && floatingChatMessages.children.length === 0) { 
@@ -321,27 +401,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 initialBotMsgDiv.classList.add('message', 'bot-message', 'intro-message');
                 initialBotMsgDiv.innerHTML = marked.parse(initialBotGreeting);
                 floatingChatMessages.appendChild(initialBotMsgDiv);
+
+                // If a report was just generated, send a hidden message to Gemini to prime its context
+                if (lastGeneratedReportInfo) {
+                    let reportSummary = `The user recently generated a ${lastGeneratedReportInfo.type} report. `;
+                    if (lastGeneratedReportInfo.type === 'astrology') {
+                        reportSummary += `It was for ${lastGeneratedReportInfo.name} born on ${lastGeneratedReportInfo.dob} at ${lastGeneratedReportInfo.tob} in ${lastGeneratedReportInfo.place}, using ${lastGeneratedReportInfo.system} system. `;
+                    } else if (lastGeneratedReportInfo.type === 'numerology') {
+                        reportSummary += `It was for ${lastGeneratedReportInfo.name} born on ${lastGeneratedReportInfo.dob}. `;
+                    }
+                    // Truncate the report content to stay within token limits for history
+                    const truncatedReport = lastGeneratedReportInfo.reportContent.substring(0, 5000) + (lastGeneratedReportInfo.reportContent.length > 5000 ? "\n...(Report truncated for brevity in chat context)..." : "");
+                    reportSummary += `The full content of this report is provided below for context in any follow-up questions the user might have about it:\n\n${truncatedReport}`;
+                    
+                    // Send this as a user message that doesn't get displayed (effectively system instruction)
+                    // This will be part of the chatSession's history
+                    try {
+                        await chatSession.sendMessage(reportSummary);
+                        console.log("Report context successfully sent to Gemini history.");
+                    } catch (error) {
+                        console.error("Error sending report context to Gemini:", error);
+                        // Optionally, add a visible message if context fails to send
+                        const contextErrorMsgDiv = document.createElement('div');
+                        contextErrorMsgDiv.classList.add('message', 'bot-message', 'intro-message');
+                        contextErrorMsgDiv.innerHTML = `<em>Apologies, I couldn't load the full context of your last report for this chat due to a technical issue. You can still ask general questions!</em>`;
+                        floatingChatMessages.appendChild(contextErrorMsgDiv);
+                    }
+                }
             }
             
             // Render any actual conversation history (from API interaction)
             renderChatMessages(); 
-
-            // Add a proactive message based on last generated report, only if applicable and not already displayed
-            if (lastGeneratedReportType) {
-                const proactiveMessageText = `I see you recently generated a **${lastGeneratedReportType.charAt(0).toUpperCase() + lastGeneratedReportType.slice(1)}** report. Do you have any questions about it?`;
-                // Check if *any* proactive message exists in the UI already
-                const isProactiveMessageDisplayed = Array.from(floatingChatMessages.children).some(
-                    (el) => el.classList.contains('proactive-message')
-                );
-
-                // Only add the proactive message if a report type is set AND it hasn't been added yet
-                if (!isProactiveMessageDisplayed) {
-                    const proactiveMsgDiv = document.createElement('div');
-                    proactiveMsgDiv.classList.add('message', 'bot-message', 'intro-message', 'proactive-message');
-                    proactiveMsgDiv.innerHTML = marked.parse(proactiveMessageText);
-                    floatingChatMessages.appendChild(proactiveMsgDiv);
-                }
-            }
             floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
         }
     });
@@ -377,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add user message to chatSession history for API call
             conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
 
-            const result = await chatSession.sendMessage(userMessage);
+            const result = await chatSession.sendMessage(userMessage); // Gemini uses its internal history for context
             const response = await result.response;
             const botReply = response.text();
 
